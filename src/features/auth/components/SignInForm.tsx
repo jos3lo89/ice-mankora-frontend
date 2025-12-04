@@ -8,13 +8,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInSchema, type SignInSchema } from "../schemas/auth.schema";
+import { useLogin } from "../hooks/useLogin";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const { mutate: login, isPending } = useLogin();
 
   const {
     register,
@@ -25,8 +28,8 @@ export default function SignInForm() {
     resolver: zodResolver(signInSchema),
   });
 
-  const onSubmit = (data: SignInSchema) => {
-    console.log(data);
+  const onSubmit = async (data: SignInSchema) => {
+    login(data);
   };
 
   const handleReset = () => {
@@ -50,6 +53,7 @@ export default function SignInForm() {
               type="text"
               placeholder="Ingresa tu usuario"
               {...register("username")}
+              disabled={isPending}
             />
             {errors.username && (
               <p className="text-red-500 text-xs mt-1">
@@ -68,6 +72,7 @@ export default function SignInForm() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Ingresa tu contraseña"
                 {...register("password")}
+                disabled={isPending}
               />
               {errors.password && (
                 <p className="text-red-500 text-xs mt-1">
@@ -81,6 +86,7 @@ export default function SignInForm() {
                 aria-label={
                   showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
                 }
+                disabled={isPending}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -89,13 +95,21 @@ export default function SignInForm() {
 
           <div className="flex gap-3 pt-4">
             <Button type="submit" className="flex-1">
-              Enviar
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Ingresando...
+                </>
+              ) : (
+                "Ingresar"
+              )}
             </Button>
             <Button
               type="button"
               variant="outline"
               className="flex-1 bg-transparent"
               onClick={handleReset}
+              disabled={isPending}
             >
               Limpiar
             </Button>
