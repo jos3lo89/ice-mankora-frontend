@@ -4,19 +4,21 @@ import { Outlet } from "react-router-dom";
 const AuthLayout = () => {
   return (
     <>
-      <header className="flex justify-between items-center px-10">
+      <header className="flex justify-end items-center px-10 py-5">
+        <ModeToggle />
+      </header>
+      <section className="py-5">
         <img
           src="./logo.webp"
           alt="logo de ice mankora"
-          className="max-w-[100px]"
+          className="mx-auto max-w-[100px]"
         />
-
-        <ModeToggle />
-      </header>
+      </section>
       <main>
         <Outlet />
       </main>
     </>
   );
 };
+
 export default AuthLayout;
