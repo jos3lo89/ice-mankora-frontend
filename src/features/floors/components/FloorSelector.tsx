@@ -7,12 +7,12 @@ interface Props {
 
 const FloorSelector = ({ floors }: Props) => {
   return (
-    <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+    <TabsList className="w-full flex gap-2 p-2 rounded-xl bg-muted/40 dark:bg-muted/20 backdrop-blur-sm">
       {floors.map((floor) => (
         <TabsTrigger
           key={floor.id}
           value={floor.id}
-          className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          className="flex-1 cursor-pointer rounded-lg px-3 py-2 font-medium text-sm transition-all border border-transparent shadow-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-accent hover:text-accent-foreground dark:data-[state=active]:bg-primary dark:hover:bg-accent/30"
         >
           {floor.name}
         </TabsTrigger>
@@ -20,4 +20,5 @@ const FloorSelector = ({ floors }: Props) => {
     </TabsList>
   );
 };
+
 export default FloorSelector;

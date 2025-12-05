@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useFloors } from "../hooks/useFloors";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { type Table } from "../types/floor.types";
 import { toast } from "sonner";
 import TableItem from "../components/TableItem";
 import { useNavigate } from "react-router-dom";
 import SpinnerLoading from "@/components/SpinnerLoading";
+import FloorSelector from "../components/FloorSelector";
 
 const FloorMapPage = () => {
   const { data: floors, isLoading, isError } = useFloors();
@@ -43,14 +44,7 @@ const FloorMapPage = () => {
           onValueChange={setSelectedFloorId}
           className="w-full"
         >
-          {/* <FloorSelector floors={floors} /> */}
-          <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-            {floors.map((floor) => (
-              <TabsTrigger key={floor.id} value={floor.id}>
-                {floor.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <FloorSelector floors={floors} />
 
           {floors.map((floor) => (
             <TabsContent key={floor.id} value={floor.id} className="">
