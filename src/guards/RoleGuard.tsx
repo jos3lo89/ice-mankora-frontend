@@ -3,13 +3,13 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import type { PropsWithChildren } from "react";
 import { Navigate } from "react-router-dom";
 
-type props = PropsWithChildren<{ allowedRoles: Roles }>;
+type props = PropsWithChildren<{ allowedRoles: Roles[] }>;
 
 const RoleGuard = ({ children, allowedRoles }: props) => {
   const { user } = useAuthStore();
 
   if (!user || !allowedRoles.includes(user.role)) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

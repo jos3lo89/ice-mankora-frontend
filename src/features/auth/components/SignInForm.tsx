@@ -51,6 +51,7 @@ export default function SignInForm() {
             <Input
               id="username"
               type="text"
+              autoComplete="off"
               placeholder="Ingresa tu usuario"
               {...register("username")}
               disabled={isPending}
@@ -69,6 +70,7 @@ export default function SignInForm() {
             <div className="relative">
               <Input
                 id="password"
+                autoComplete="off"
                 type={showPassword ? "text" : "password"}
                 placeholder="Ingresa tu contraseña"
                 {...register("password")}
