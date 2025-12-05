@@ -7,7 +7,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Product } from "../types/catalog.types";
 import { useState } from "react";
@@ -15,6 +14,7 @@ import { Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/useCartStore";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Props {
   product: Product | null;
@@ -115,10 +115,9 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
             </Button>
           </div>
 
-          {/* Notas */}
           <div className="space-y-2">
             <Label>Notas de Cocina (Opcional)</Label>
-            <Input
+            <Textarea
               placeholder="Ej: Sin hielo, Poco picante..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -128,7 +127,7 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
 
         <DialogFooter>
           <Button onClick={handleSave} className="w-full text-lg h-12">
-            Agregar al Pedido (S/{" "}
+            Agregar al Pedido S/
             {(
               (Number(product.price) +
                 selectedVariants.reduce(
@@ -137,7 +136,6 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
                 )) *
               quantity
             ).toFixed(2)}
-            )
           </Button>
         </DialogFooter>
       </DialogContent>

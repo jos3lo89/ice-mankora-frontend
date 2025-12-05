@@ -1,7 +1,11 @@
 export interface ProductVariant {
   id: string;
+  productId: string;
   name: string;
-  priceExtra: number;
+  priceExtra: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Product {

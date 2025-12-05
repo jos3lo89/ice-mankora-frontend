@@ -1,11 +1,24 @@
-import type { CartItem, Product } from "@/features/orders/types/catalog.types";
+import type {
+  CartItem,
+  Product,
+  ProductVariant,
+} from "@/features/orders/types/catalog.types";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface CartState {
   tableId: string | null;
   items: CartItem[];
 
-  // Acciones
+  updateItem: (
+    tempId: string,
+    data: {
+      quantity?: number;
+      notes?: string;
+      variants?: ProductVariant[];
+    }
+  ) => void;
+
   setTableId: (id: string) => void;
   addItem: (
     product: Product,
@@ -16,47 +29,89 @@ interface CartState {
   removeItem: (tempId: string) => void;
   clearCart: () => void;
 
-  // Getters computados
   total: () => number;
   itemCount: () => number;
 }
 
-export const useCartStore = create<CartState>((set, get) => ({
-  tableId: null,
-  items: [],
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
+      tableId: null,
+      items: [],
 
-  setTableId: (id) => set({ tableId: id }),
+      setTableId: (id) => set({ tableId: id }),
 
-  addItem: (product, quantity, notes, variants) => {
-    // Calcular el string para el backend
-    const variantsDetailString = variants.map((v) => v.name).join(", ");
+      addItem: (product, quantity, notes, variants) => {
+        const variantsDetailString = variants.map((v) => v.name).join(", ");
 
-    // Calcular subtotal (Precio base + Extras) * Cantidad
-    const extrasTotal = variants.reduce(
-      (acc, v) => acc + Number(v.priceExtra),
-      0
-    );
-    const unitPrice = Number(product.price) + extrasTotal;
+        const extrasTotal = variants.reduce(
+          (acc, v) => acc + Number(v.priceExtra),
+          0
+        );
 
-    const newItem: CartItem = {
-      tempId: crypto.randomUUID(),
-      product,
-      quantity,
-      notes,
-      selectedVariants: variants,
-      variantsDetailString,
-      subtotal: unitPrice * quantity,
-    };
+        const unitPrice = Number(product.price) + extrasTotal;
 
-    set((state) => ({ items: [...state.items, newItem] }));
-  },
+        const newItem: CartItem = {
+          tempId: crypto.randomUUID(),
+          product,
+          quantity,
+          notes,
+          selectedVariants: variants,
+          variantsDetailString,
+          subtotal: unitPrice * quantity,
+        };
 
-  removeItem: (tempId) => {
-    set((state) => ({ items: state.items.filter((i) => i.tempId !== tempId) }));
-  },
+        set((state) => ({ items: [...state.items, newItem] }));
+      },
 
-  clearCart: () => set({ items: [], tableId: null }),
+      updateItem: (tempId, data) => {
+        set((state) => ({
+          items: state.items.map((item) => {
+            if (item.tempId !== tempId) return item;
 
-  total: () => get().items.reduce((acc, item) => acc + item.subtotal, 0),
-  itemCount: () => get().items.reduce((acc, item) => acc + item.quantity, 0),
-}));
+            const updated = {
+              ...item,
+              quantity: data.quantity ?? item.quantity,
+              notes: data.notes ?? item.notes,
+              selectedVariants: data.variants ?? item.selectedVariants,
+            };
+
+            const extrasTotal = updated.selectedVariants.reduce(
+              (acc, v) => acc + Number(v.priceExtra),
+              0
+            );
+
+            updated.variantsDetailString = updated.selectedVariants
+              .map((v) => v.name)
+              .join(", ");
+
+            updated.subtotal =
+              (Number(updated.product.price) + extrasTotal) * updated.quantity;
+
+            return updated;
+          }),
+        }));
+      },
+
+      removeItem: (tempId) => {
+        set((state) => ({
+          items: state.items.filter((i) => i.tempId !== tempId),
+        }));
+      },
+
+      clearCart: () => set({ items: [], tableId: null }),
+
+      total: () => get().items.reduce((acc, item) => acc + item.subtotal, 0),
+
+      itemCount: () =>
+        get().items.reduce((acc, item) => acc + item.quantity, 0),
+    }),
+    {
+      name: "cart-storage", // nombre en localStorage
+      partialize: (state) => ({
+        tableId: state.tableId,
+        items: state.items,
+      }),
+    }
+  )
+);
