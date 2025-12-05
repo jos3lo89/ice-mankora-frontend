@@ -1,13 +1,6 @@
-import type { Roles } from "@/enums/roles.enum";
+import type { User } from "@/types/user.types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
-interface User {
-  userId: string;
-  name: string;
-  role: Roles;
-  allowedFloorIds: string[];
-}
 
 interface AuthState {
   user: User | null;
