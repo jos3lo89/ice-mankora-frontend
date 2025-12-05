@@ -1,10 +1,11 @@
+import type { Roles } from "@/enums/roles.enum";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface User {
   userId: string;
   name: string;
-  role: "ADMIN" | "MOZO" | "CAJERO";
+  role: Roles;
   allowedFloorIds: string[];
 }
 
