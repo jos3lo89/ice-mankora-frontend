@@ -11,8 +11,11 @@ const App = () => {
     <ThemeProvider defaultTheme="dark" storageKey="ice-mankora-theme">
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-        <ReactQueryDevtools initialIsOpen={false} />
-        <Toaster closeButton richColors />
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-left"
+        />
+        <Toaster closeButton richColors position="top-center" />
       </QueryClientProvider>
     </ThemeProvider>
   );

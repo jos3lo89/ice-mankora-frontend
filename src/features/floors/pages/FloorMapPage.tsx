@@ -47,14 +47,14 @@ const FloorMapPage = () => {
           <FloorSelector floors={floors} />
 
           {floors.map((floor) => (
-            <TabsContent key={floor.id} value={floor.id} className="">
+            <TabsContent key={floor.id} value={floor.id}>
               <Card className="p-6">
                 {floor.tables.length === 0 ? (
                   <p className="text-center text-muted-foreground">
                     No hay mesas en este piso.
                   </p>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {floor.tables.map((table) => (
                       <TableItem
                         key={table.id}

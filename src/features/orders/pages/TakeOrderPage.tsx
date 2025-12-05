@@ -1,35 +1,39 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useCatalog } from "../hooks/useCatalog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronLeft } from "lucide-react";
+import { Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { ProductModal } from "../components/ProductModal";
 import { OrderSummary } from "../components/OrderSummary";
 import { useCartStore } from "@/stores/useCartStore";
 import type { Product } from "../types/catalog.types";
-import { Button } from "@/components/ui/button";
+import SpinnerLoading from "@/components/SpinnerLoading";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function TakeOrderPage() {
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
-  const navigate = useNavigate();
 
   const { categoriesQuery, productsQuery } = useCatalog();
   const setStoreTableId = useCartStore((state) => state.setTableId);
-  // const clearCart = useCartStore((state) => state.clearCart);
 
-  // Estados Locales
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Inicializar Store
+  const [openFilter, setOpenFilter] = useState(false);
+
   useEffect(() => {
     if (tableId) {
-      // Si cambiamos de mesa, ¿limpiamos carrito?
-      // Por ahora asumimos que sí para evitar mezclas
       setStoreTableId(tableId);
     }
   }, [tableId, setStoreTableId]);
@@ -37,7 +41,6 @@ export default function TakeOrderPage() {
   const categories = categoriesQuery.data || [];
   const products = productsQuery.data || [];
 
-  // Filtrado de Productos
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
       selectedCategory === "ALL" || product.categoryId === selectedCategory;
@@ -47,20 +50,11 @@ export default function TakeOrderPage() {
     return matchesCategory && matchesSearch;
   });
 
-  if (productsQuery.isLoading)
-    return <div className="p-10">Cargando Carta...</div>;
+  if (productsQuery.isLoading) return <SpinnerLoading />;
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] pb-20">
-      {/* Header Navegación */}
-      <div className="flex items-center gap-2 mb-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <ChevronLeft />
-        </Button>
-        <h1 className="text-xl font-bold">Tomar Pedido</h1>
-      </div>
-
-      {/* Buscador */}
+      {/* BUSCADOR */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
@@ -71,34 +65,78 @@ export default function TakeOrderPage() {
         />
       </div>
 
-      {/* Categorías (Tabs) */}
-      <Tabs
-        defaultValue="ALL"
-        value={selectedCategory}
-        onValueChange={setSelectedCategory}
-        className="w-full"
-      >
-        <TabsList className="w-full justify-start overflow-x-auto h-auto p-1 gap-2 bg-transparent">
-          <TabsTrigger
-            value="ALL"
-            className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-full border px-4 py-2"
-          >
-            Todos
-          </TabsTrigger>
-          {categories.map((cat) => (
+      {/* CATEGORÍAS — DESKTOP */}
+      <div className="hidden lg:block">
+        <Tabs
+          defaultValue="ALL"
+          value={selectedCategory}
+          onValueChange={setSelectedCategory}
+          className="w-full"
+        >
+          <TabsList className="w-full flex gap-2 overflow-x-auto h-auto p-1 bg-transparent">
             <TabsTrigger
-              key={cat.id}
-              value={cat.id}
-              className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-full border px-4 py-2 whitespace-nowrap"
+              value="ALL"
+              className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-full border px-4 py-2"
             >
-              {cat.name}
+              Todos
             </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
 
-      {/* Grid de Productos */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+            {categories.map((cat) => (
+              <TabsTrigger
+                key={cat.id}
+                value={cat.id}
+                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-full border px-4 py-2 whitespace-nowrap"
+              >
+                {cat.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
+
+      <div className="lg:hidden flex justify-between items-center mb-4">
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
+          <TabsList className="flex gap-2 bg-transparent">
+            <TabsTrigger
+              value="ALL"
+              className="rounded-full border px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              Todos
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        <Sheet open={openFilter} onOpenChange={setOpenFilter}>
+          <SheetTrigger className="px-4 py-2 bg-primary text-white rounded-full">
+            Filtrar
+          </SheetTrigger>
+
+          <SheetContent side="bottom" className="h-[60%] p-4">
+            <SheetHeader>
+              <SheetTitle>Categorías</SheetTitle>
+              <SheetDescription></SheetDescription>
+            </SheetHeader>
+
+            <div className="grid grid-cols-2 gap-3 overflow-y-auto mt-4 max-h-[300px] pr-1">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  className="rounded-lg bg-muted hover:bg-primary hover:text-white py-3 text-center transition-all"
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    setOpenFilter(false);
+                  }}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* GRID DE PRODUCTOS ADAPTADO */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
         {filteredProducts.map((product) => (
           <ProductCard
             key={product.id}
@@ -108,14 +146,13 @@ export default function TakeOrderPage() {
         ))}
       </div>
 
-      {/* Mensaje Vacío */}
       {filteredProducts.length === 0 && (
         <div className="text-center py-20 text-muted-foreground">
           No se encontraron productos
         </div>
       )}
 
-      {/* MODAL DE SELECCIÓN */}
+      {/* MODAL DE PRODUCTOS */}
       <ProductModal
         open={!!selectedProduct}
         product={selectedProduct}

@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import BackButton from "@/components/BackButton";
 
 const MozoLayout = () => {
   const { user, logout } = useAuthStore();
@@ -26,6 +27,7 @@ const MozoLayout = () => {
         </div>
 
         <div className="flex gap-2">
+          <BackButton to="/mozo/map" title="Mesas" />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -58,7 +60,7 @@ const MozoLayout = () => {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4 max-w-5xl mx-auto custom-scroll">
+      <main className="flex-1 overflow-y-auto p-4  custom-scroll">
         <Outlet />
       </main>
 
