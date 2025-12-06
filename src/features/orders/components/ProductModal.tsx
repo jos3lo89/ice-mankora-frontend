@@ -34,7 +34,6 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
     addItem(product, quantity, notes, selectedVariants);
     toast.success(`${quantity} x ${product.name} agregado`);
     onClose();
-    // Reset local state
     setQuantity(1);
     setNotes("");
     setSelectedVariants([]);
@@ -59,7 +58,6 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* Variantes (Si existen) */}
           {product.variants && product.variants.length > 0 && (
             <div className="space-y-2">
               <Label>Opciones:</Label>
@@ -90,7 +88,6 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
             </div>
           )}
 
-          {/* Cantidad */}
           <div className="flex items-center justify-center gap-6 py-4">
             <Button
               variant="outline"

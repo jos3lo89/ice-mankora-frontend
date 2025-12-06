@@ -15,7 +15,7 @@ const App = () => {
           initialIsOpen={false}
           buttonPosition="bottom-left"
         />
-        <Toaster closeButton richColors position="top-center" />
+        <Toaster closeButton richColors position="bottom-center" />
       </QueryClientProvider>
     </ThemeProvider>
   );

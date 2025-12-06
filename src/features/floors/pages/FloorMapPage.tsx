@@ -23,7 +23,9 @@ const FloorMapPage = () => {
 
   const handleTableClick = (table: Table) => {
     if (table.status === "LIBRE") {
-      navigate(`/mozo/order/new?tableId=${table.id}`);
+      navigate(
+        `/mozo/order/new?tableId=${table.id}&tableName=${table.name}&tableNumber=${table.number}`
+      );
     } else if (table.status === "PIDIENDO_CUENTA") {
       toast.warning(`La Mesa ${table.number} quiere pagar.`);
     } else {

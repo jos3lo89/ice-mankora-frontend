@@ -18,13 +18,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 export default function TakeOrderPage() {
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
+  const tableName = searchParams.get("tableName");
+  const tableNumber = searchParams.get("tableNumber");
 
   const { categoriesQuery, productsQuery } = useCatalog();
-  const setStoreTableId = useCartStore((state) => state.setTableId);
+  const setStoreTable = useCartStore((state) => state.setTable);
 
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,9 +37,13 @@ export default function TakeOrderPage() {
 
   useEffect(() => {
     if (tableId) {
-      setStoreTableId(tableId);
+      setStoreTable({
+        id: tableId,
+        name: tableName || "",
+        tableNumber: tableNumber || "",
+      });
     }
-  }, [tableId, setStoreTableId]);
+  }, [tableId, tableName, tableNumber, setStoreTable]);
 
   const categories = categoriesQuery.data || [];
   const products = productsQuery.data || [];
@@ -54,7 +61,6 @@ export default function TakeOrderPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] pb-20">
-      {/* BUSCADOR */}
       <div className="relative mb-6">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
@@ -65,7 +71,6 @@ export default function TakeOrderPage() {
         />
       </div>
 
-      {/* CATEGORÍAS — DESKTOP */}
       <div className="hidden lg:block">
         <Tabs
           defaultValue="ALL"
@@ -119,23 +124,22 @@ export default function TakeOrderPage() {
 
             <div className="grid grid-cols-2 gap-3 overflow-y-auto mt-4 max-h-[300px] pr-1">
               {categories.map((cat) => (
-                <button
+                <Button
                   key={cat.id}
-                  className="rounded-lg bg-muted hover:bg-primary hover:text-white py-3 text-center transition-all"
+                  className="rounded-lg  py-3 text-center transition-all"
                   onClick={() => {
                     setSelectedCategory(cat.id);
                     setOpenFilter(false);
                   }}
                 >
                   {cat.name}
-                </button>
+                </Button>
               ))}
             </div>
           </SheetContent>
         </Sheet>
       </div>
 
-      {/* GRID DE PRODUCTOS ADAPTADO */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
         {filteredProducts.map((product) => (
           <ProductCard
@@ -152,14 +156,12 @@ export default function TakeOrderPage() {
         </div>
       )}
 
-      {/* MODAL DE PRODUCTOS */}
       <ProductModal
         open={!!selectedProduct}
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
       />
 
-      {/* CARRITO FLOTANTE */}
       <OrderSummary />
     </div>
   );

@@ -1,19 +1,16 @@
 import axiosInstance from "@/lib/axios";
 import type { Category, Product } from "../types/catalog.types";
 
-// Obtener Categorías
 export const getCategories = async (): Promise<Category[]> => {
   const { data } = await axiosInstance.get("/catalog/categories");
   return data;
 };
 
-// Obtener Productos
 export const getProducts = async (): Promise<Product[]> => {
   const { data } = await axiosInstance.get("/catalog/products");
   return data;
 };
 
-// Enviar Pedido
 export interface CreateOrderPayload {
   tableId: string;
   items: {

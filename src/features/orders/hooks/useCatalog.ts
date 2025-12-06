@@ -30,8 +30,8 @@ export const useCreateOrder = () => {
     mutationFn: createOrder,
     onSuccess: () => {
       toast.success("Pedido enviado a cocina 👨‍🍳");
-      clearCart(); // Limpiamos carrito
-      navigate("/mozo/map"); // Volvemos al mapa
+      clearCart();
+      navigate("/mozo/map");
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Error al enviar pedido");

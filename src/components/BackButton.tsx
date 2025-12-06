@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface BackButtonProps {
-  to?: string; // opcional
+  to?: string;
   title?: string;
 }
 
@@ -12,9 +12,9 @@ const BackButton = ({ to, title }: BackButtonProps) => {
 
   const handleClick = () => {
     if (to) {
-      navigate(to); // Ir a la ruta indicada
+      navigate(to);
     } else {
-      navigate(-1); // Volver atrás si no se pasa ruta
+      navigate(-1);
     }
   };
 
