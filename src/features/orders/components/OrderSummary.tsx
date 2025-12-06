@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ShoppingBasket, Trash2, Send, Pencil } from "lucide-react";
 import { useCartStore } from "@/stores/useCartStore";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useCreateOrder } from "../hooks/useCatalog";
 import { useState } from "react";
 import type { CartItem } from "../types/catalog.types";
@@ -53,12 +53,13 @@ export const OrderSummary = () => {
         </SheetTrigger>
         <SheetContent className="w-full sm:max-w-md flex flex-col h-full">
           <SheetHeader>
-            <SheetTitle>Pedido Mesa {tableId && "Seleccionada"}</SheetTitle>
+            <SheetTitle>Pedido Mesa</SheetTitle>
             <SheetDescription></SheetDescription>
           </SheetHeader>
 
-          <ScrollArea className="flex-1 -mx-6 px-6 my-4">
-            <div className="space-y-4">
+          {/* Contenedor scrolleable */}
+          <div className="flex-1 overflow-y-auto px-2 my-4 custom-scroll">
+            <div className="space-y-4 ">
               {items.map((item) => (
                 <div
                   key={item.tempId}
@@ -104,7 +105,7 @@ export const OrderSummary = () => {
                 </div>
               ))}
             </div>
-          </ScrollArea>
+          </div>
 
           <SheetFooter className="mt-auto border-t pt-4">
             <div className="w-full space-y-4">
