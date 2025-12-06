@@ -11,12 +11,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  server: {
-    host: true,
-    port: 4000,
-  },
-  preview: {
-    host: true,
-    port: 4000,
-  },
+  // server: {
+  //   host: true,
+  //   port: 5173,
+  // },
+  // preview: {
+  //   host: true,
+  //   port: 5173,
+  // },
 });
