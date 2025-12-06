@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ShoppingBasket, Trash2, Send, Pencil } from "lucide-react";
 import { useCartStore } from "@/stores/useCartStore";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useCreateOrder } from "../hooks/useCatalog";
 import { useState } from "react";
 import type { CartItem } from "../types/catalog.types";
