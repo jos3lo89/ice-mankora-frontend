@@ -9,10 +9,12 @@ import RootRedirect from "@/components/RootRedirect";
 import { Roles } from "@/enums/roles.enum";
 import {
   DashboardAdminPage,
+  DashboardCajaPage,
   FloorMapPage,
   NotFound,
   SignInPage,
   TakeOrderPage,
+  UserProfile,
 } from "./lazy";
 import Loading from "@/components/Loading";
 import AuthGuard from "@/guards/AuthGuard";
@@ -99,13 +101,21 @@ export const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <div>Dashboard de Caja (Pendiente)</div>,
+        element: <DashboardCajaPage />,
       },
       {
         path: "map",
         element: (
           <Suspense fallback={<Loading />}>
             <FloorMapPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <UserProfile />
           </Suspense>
         ),
       },

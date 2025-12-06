@@ -41,7 +41,7 @@ export const sideBarData = {
         icon: Home,
       },
       {
-        title: "Asistencia",
+        title: "Caja",
         url: "#",
         icon: UserPlus,
         isActive: true,

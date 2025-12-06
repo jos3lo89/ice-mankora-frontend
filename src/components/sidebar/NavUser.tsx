@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import UserMenu from "./UserMenu";
 
 const NavUser = () => {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   if (!user) {
     return <Loader2 className="animate-spin w-6 h-6" />;
@@ -13,7 +13,7 @@ const NavUser = () => {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <UserMenu user={user} />
+        <UserMenu user={user} logout={logout} />
       </SidebarMenuItem>
     </SidebarMenu>
   );

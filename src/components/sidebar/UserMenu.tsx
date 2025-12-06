@@ -15,9 +15,10 @@ import type { User } from "@/types/user.types";
 
 type UserMenuProps = {
   user: User;
+  logout: () => void;
 };
 
-const UserMenu = ({ user }: UserMenuProps) => {
+const UserMenu = ({ user, logout }: UserMenuProps) => {
   const { isMobile, setOpenMobile } = useSidebar();
 
   const handleLinkClick = () => {
@@ -33,7 +34,18 @@ const UserMenu = ({ user }: UserMenuProps) => {
     .map((p) => p.charAt(0).toUpperCase())
     .join("");
 
-  const logOut = async () => {};
+  const getUrlProfile = () => {
+    switch (user.role) {
+      case "ADMIN":
+        return "/admin/profile";
+      case "CAJERO":
+        return "/caja/profile";
+      case "MOZO":
+        return "/mozo/profile";
+      default:
+        return "/";
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -77,7 +89,7 @@ const UserMenu = ({ user }: UserMenuProps) => {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Link
-              to="/user/profile"
+              to={getUrlProfile()}
               className="flex items-center w-full cursor-pointer"
               onClick={handleLinkClick}
             >
@@ -87,7 +99,7 @@ const UserMenu = ({ user }: UserMenuProps) => {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logOut}>
+        <DropdownMenuItem onClick={() => logout()}>
           <LogOut />
           Cerrar sesión
         </DropdownMenuItem>
