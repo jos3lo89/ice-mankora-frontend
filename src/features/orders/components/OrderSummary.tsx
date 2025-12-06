@@ -35,13 +35,14 @@ export const OrderSummary = () => {
     sendOrder(payload);
   };
 
-  if (itemCount() === 0) return null; // No mostrar si está vacío
+  if (itemCount() === 0) return null;
 
   return (
     <>
+      {/* BOTÓN FLOTANTE DEL CARRITO */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button className="fixed bottom-4 right-4 h-16 w-16 rounded-full shadow-xl z-50 animate-in zoom-in cursor-pointer">
+          <Button className="fixed bottom-4 right-4 h-16 w-16 cursor-pointer rounded-full shadow-2xl  z-50">
             <div className="relative">
               <ShoppingBasket size={28} />
               <span className="absolute -top-5 -right-5 bg-red-600 text-white text-xs font-bold h-6 w-6 rounded-full flex items-center justify-center border-2 border-white">
@@ -50,70 +51,80 @@ export const OrderSummary = () => {
             </div>
           </Button>
         </SheetTrigger>
-        <SheetContent className="w-full sm:max-w-md flex flex-col h-full">
-          <SheetHeader>
-            <SheetTitle>Pedido Mesa</SheetTitle>
-            <SheetDescription></SheetDescription>
-          </SheetHeader>
 
-          {/* Contenedor scrolleable */}
-          <div className="flex-1 overflow-y-auto px-2 my-4 custom-scroll">
-            <div className="space-y-4 ">
-              {items.map((item) => (
-                <div
-                  key={item.tempId}
-                  className="flex justify-between items-start border-b pb-4"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-primary">
-                        {item.quantity}x
-                      </span>
-                      <span className="font-medium">{item.product.name}</span>
-                    </div>
-                    {item.variantsDetailString && (
-                      <p className="text-xs text-muted-foreground ml-6">
-                        +{item.variantsDetailString}
-                      </p>
-                    )}
-                    {item.notes && (
-                      <p className="text-xs text-orange-600 italic ml-6">
-                        Nota: {item.notes}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setEditingItem(item)}
-                      className="text-blue-400 hover:text-blue-600"
-                    >
-                      <Pencil size={18} />
-                    </button>
-
-                    <button
-                      onClick={() => removeItem(item.tempId)}
-                      className="text-red-400 hover:text-red-600"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-
-                    <span className="font-semibold">
-                      S/ {item.subtotal.toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* CONTENIDO DEL SHEET */}
+        <SheetContent className="w-full sm:max-w-md flex flex-col h-full p-0">
+          <div className="border-b">
+            <SheetHeader>
+              <SheetTitle>Pedidos</SheetTitle>
+              <SheetDescription></SheetDescription>
+            </SheetHeader>
           </div>
 
-          <SheetFooter className="mt-auto border-t pt-4">
-            <div className="w-full space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 pt-4 space-y-4 custom-scroll">
+            {items.map((item) => (
+              <div
+                key={item.tempId}
+                className="shadow-sm rounded-xl p-4 flex justify-between items-start"
+              >
+                {/* INFO DEL PRODUCTO */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-green-600">
+                      {item.quantity}x
+                    </span>
+                    <span className="font-semibold ">{item.product.name}</span>
+                  </div>
+
+                  {/* VARIANTES */}
+                  {item.variantsDetailString && (
+                    <p className="text-xs ml-6">
+                      + {item.variantsDetailString}
+                    </p>
+                  )}
+
+                  {/* NOTAS */}
+                  {item.notes && (
+                    <p className="text-xs text-orange-600 italic ml-6">
+                      Nota: {item.notes}
+                    </p>
+                  )}
+
+                  {/* PRECIO */}
+                  <p className="ml-6 mt-1 font-bold ">
+                    S/ {item.subtotal.toFixed(2)}
+                  </p>
+                </div>
+
+                {/* ACCIONES */}
+                <div className="flex flex-col gap-3 pl-4">
+                  <button
+                    onClick={() => setEditingItem(item)}
+                    className="text-blue-500 hover:text-blue-700 cursor-pointer"
+                  >
+                    <Pencil size={18} />
+                  </button>
+
+                  <button
+                    onClick={() => removeItem(item.tempId)}
+                    className="text-red-500 hover:text-red-700 cursor-pointer"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <SheetFooter>
+            <div className="w-full p-6 border-t space-y-4">
               <div className="flex justify-between text-xl font-bold">
                 <span>Total</span>
                 <span>S/ {total().toFixed(2)}</span>
               </div>
+
               <Button
-                className="w-full h-12 text-lg"
+                className="w-full text-lg cursor-pointer rounded-xl bg-green-600 hover:bg-green-700"
                 onClick={handleSend}
                 disabled={isPending}
               >
@@ -121,7 +132,7 @@ export const OrderSummary = () => {
                   "Enviando..."
                 ) : (
                   <span className="flex items-center gap-2">
-                    Confirmar Pedido <Send size={18} />
+                    Confirmar Pedido <Send size={20} />
                   </span>
                 )}
               </Button>
@@ -130,7 +141,7 @@ export const OrderSummary = () => {
         </SheetContent>
       </Sheet>
 
-      {/* MODAL DE EDICIÓN */}
+      {/* MODAL PARA EDITAR ITEM */}
       {editingItem && (
         <ItemEditModal
           item={editingItem}
