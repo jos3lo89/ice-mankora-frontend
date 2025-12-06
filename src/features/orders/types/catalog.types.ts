@@ -11,7 +11,7 @@ export interface ProductVariant {
 export interface Product {
   id: string;
   name: string;
-  price: number; // El precio base que viene del backend (decimal string o number)
+  price: number;
   stockDaily: number;
   isStockManaged: boolean;
   categoryId: string;
@@ -24,13 +24,12 @@ export interface Category {
   slug: string;
 }
 
-// Lo que guardamos en el carrito
 export interface CartItem {
-  tempId: string; // ID temporal para identificarlo en el array (uuid local)
+  tempId: string;
   product: Product;
   quantity: number;
   notes?: string;
-  selectedVariants: ProductVariant[]; // Para mostrar en el resumen
-  variantsDetailString: string; // Lo que se manda al backend ("Sabor: Fresa")
+  selectedVariants: ProductVariant[];
+  variantsDetailString: string;
   subtotal: number;
 }

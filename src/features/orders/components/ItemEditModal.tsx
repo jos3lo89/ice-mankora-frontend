@@ -5,8 +5,8 @@ import type {
   ProductVariant,
 } from "@/features/orders/types/catalog.types";
 import { useCartStore } from "@/stores/useCartStore";
-import { Button } from "@/components/ui/button"; // Botones normales de shadcn
-import { Checkbox } from "@/components/ui/checkbox"; // Checkbox normal
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MinusIcon, PlusIcon, X } from "lucide-react";
@@ -28,13 +28,11 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
   );
   const [mounted, setMounted] = useState(false);
 
-  // Necesario para el Portal (asegura que el componente esté montado en cliente)
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
   }, []);
 
-  // Bloquear scroll del body cuando el modal está abierto
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -63,31 +61,24 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
     onClose();
   };
 
-  // Si no está abierto o no está montado, no renderizamos nada
   if (!open || !mounted) return null;
 
-  // Usamos createPortal para "teletransportar" este HTML al final del body
-  // Esto garantiza que esté visualmente ENCIMA del Sheet (que tiene z-index 50)
   return createPortal(
     <div className="fixed inset-0 z-9999 flex items-center justify-center">
-      {/* 1. EL FONDO (BACKDROP) */}
       <div
         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
-        onClick={onClose} // Cerrar al hacer clic fuera
+        onClick={onClose}
       />
 
-      {/* 2. EL CONTENIDO DEL MODAL */}
       <div
         className="relative z-50 w-full max-w-md gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg animate-in zoom-in-95 fade-in mx-4"
-        onClick={(e) => e.stopPropagation()} // IMPORTANTE: Evita que el clic dentro cierre el modal
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Cabecera visual (imitando DialogHeader) */}
         <div className="flex flex-col space-y-1.5 text-center sm:text-left mb-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold leading-none tracking-tight">
               Editar producto
             </h2>
-            {/* Botón X para cerrar explícitamente */}
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-900 cursor-pointer"
@@ -121,7 +112,6 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
           </Button>
         </div>
 
-        {/* Variantes */}
         {item.product.variants && item.product.variants.length > 0 && (
           <div className="space-y-4 py-4 max-h-[30vh] overflow-y-auto custom-scroll pr-1">
             <Label>Opciones:</Label>
@@ -132,7 +122,7 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
                   className="flex items-center space-x-2 border p-3 rounded-md hover:bg-accent/50 transition-colors"
                 >
                   <Checkbox
-                    id={`modal-${v.id}`} // ID único para evitar conflictos
+                    id={`modal-${v.id}`}
                     checked={variants.some((s) => s.id === v.id)}
                     onCheckedChange={() => toggleVariant(v)}
                   />
@@ -158,7 +148,6 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
           />
         </div>
 
-        {/* Footer (imitando DialogFooter) */}
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6">
           <Button variant="outline" onClick={onClose} className="h-10">
             Cancelar
@@ -179,6 +168,6 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
         </div>
       </div>
     </div>,
-    document.body // Aquí le decimos que renderice esto DIRECTAMENTE en el body
+    document.body
   );
 };

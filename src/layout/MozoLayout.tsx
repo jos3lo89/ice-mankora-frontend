@@ -6,11 +6,12 @@ import {
   LogOut,
   ClipboardList,
   UtensilsCrossed,
+  Sun,
+  Moon,
+  Laptop,
 } from "lucide-react";
-import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
 
-// Componentes Shadcn
 import {
   Sheet,
   SheetContent,
@@ -25,15 +26,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTheme } from "@/components/theme/theme-provider";
+import { OrderSummary } from "@/features/orders/components/OrderSummary";
 
 const MozoLayout = () => {
   const { user, logout } = useAuthStore();
+  const { setTheme } = useTheme();
 
-  // Obtener iniciales para el avatar (ej: Juan Perez -> JP)
   const getInitials = (name: string) => {
     return (
       name
@@ -47,9 +54,7 @@ const MozoLayout = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground">
-      {/* --- HEADER SUPERIOR --- */}
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4 h-16 flex items-center justify-between">
-        {/* IZQUIERDA: Menú Hamburguesa */}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="-ml-2">
@@ -65,7 +70,6 @@ const MozoLayout = () => {
               <SheetDescription></SheetDescription>
             </SheetHeader>
 
-            {/* Navegación dentro del Sheet */}
             <nav className="flex flex-col gap-4 mt-8">
               <SheetClose asChild>
                 <Link
@@ -86,28 +90,24 @@ const MozoLayout = () => {
                   Mis Pedidos
                 </Link>
               </SheetClose>
-
-              {/* Agrega más enlaces aquí si necesitas */}
             </nav>
           </SheetContent>
         </Sheet>
 
-        {/* CENTRO: Título o Logo (Opcional, puede ir vacío) */}
         <div className="font-semibold text-lg flex items-center gap-2 text-pink-600">
           <UtensilsCrossed size={20} />
           <span>Ice Mankora</span>
         </div>
 
-        {/* DERECHA: Usuario y Tema */}
         <div className="flex items-center gap-2">
-          <ModeToggle />
+          <OrderSummary />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Avatar className="h-8 w-8 border">
                   <AvatarImage src="" alt={user?.name} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
                     {getInitials(user?.name || "")}
                   </AvatarFallback>
                 </Avatar>
@@ -125,6 +125,33 @@ const MozoLayout = () => {
                   </p>
                 </div>
               </DropdownMenuLabel>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="ml-2">Apariencia</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem onClick={() => setTheme("light")}>
+                      <Sun className="mr-2 h-4 w-4" />
+                      <span>Claro</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("dark")}>
+                      <Moon className="mr-2 h-4 w-4" />
+                      <span>Oscuro</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                      <Laptop className="mr-2 h-4 w-4" />
+                      <span>Sistema</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
@@ -139,7 +166,6 @@ const MozoLayout = () => {
         </div>
       </header>
 
-      {/* --- CONTENIDO PRINCIPAL --- */}
       <main className="flex-1 overflow-y-auto p-4 custom-scroll relative">
         <Outlet />
       </main>

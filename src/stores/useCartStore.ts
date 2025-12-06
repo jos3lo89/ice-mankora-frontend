@@ -6,8 +6,14 @@ import type {
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+interface Table {
+  id: string;
+  name: string;
+  tableNumber: string;
+}
+
 interface CartState {
-  tableId: string | null;
+  table: Table | null;
   items: CartItem[];
 
   updateItem: (
@@ -19,7 +25,8 @@ interface CartState {
     }
   ) => void;
 
-  setTableId: (id: string) => void;
+  setTable: (table: Table) => void;
+
   addItem: (
     product: Product,
     quantity: number,
@@ -36,10 +43,10 @@ interface CartState {
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
-      tableId: null,
+      table: null,
       items: [],
 
-      setTableId: (id) => set({ tableId: id }),
+      setTable: (table) => set({ table }),
 
       addItem: (product, quantity, notes, variants) => {
         const variantsDetailString = variants.map((v) => v.name).join(", ");
@@ -99,7 +106,7 @@ export const useCartStore = create<CartState>()(
         }));
       },
 
-      clearCart: () => set({ items: [], tableId: null }),
+      clearCart: () => set({ items: [], table: null }),
 
       total: () => get().items.reduce((acc, item) => acc + item.subtotal, 0),
 
@@ -107,9 +114,9 @@ export const useCartStore = create<CartState>()(
         get().items.reduce((acc, item) => acc + item.quantity, 0),
     }),
     {
-      name: "cart-storage", // nombre en localStorage
+      name: "cart-storage",
       partialize: (state) => ({
-        tableId: state.tableId,
+        tableId: state.table?.id,
         items: state.items,
       }),
     }
