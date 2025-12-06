@@ -10,10 +10,8 @@ import {
   Moon,
   Laptop,
 } from "lucide-react";
-import { ModeToggle } from "@/components/theme/mode-toggle";
 import { Button } from "@/components/ui/button";
 
-// Componentes Shadcn
 import {
   Sheet,
   SheetContent,
@@ -43,7 +41,6 @@ const MozoLayout = () => {
   const { user, logout } = useAuthStore();
   const { setTheme } = useTheme();
 
-  // Obtener iniciales para el avatar (ej: Juan Perez -> JP)
   const getInitials = (name: string) => {
     return (
       name
@@ -57,9 +54,7 @@ const MozoLayout = () => {
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground">
-      {/* --- HEADER SUPERIOR --- */}
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4 h-16 flex items-center justify-between">
-        {/* IZQUIERDA: Menú Hamburguesa */}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="-ml-2">
@@ -75,7 +70,6 @@ const MozoLayout = () => {
               <SheetDescription></SheetDescription>
             </SheetHeader>
 
-            {/* Navegación dentro del Sheet */}
             <nav className="flex flex-col gap-4 mt-8">
               <SheetClose asChild>
                 <Link
@@ -96,22 +90,16 @@ const MozoLayout = () => {
                   Mis Pedidos
                 </Link>
               </SheetClose>
-
-              {/* Agrega más enlaces aquí si necesitas */}
             </nav>
           </SheetContent>
         </Sheet>
 
-        {/* CENTRO: Título o Logo (Opcional, puede ir vacío) */}
         <div className="font-semibold text-lg flex items-center gap-2 text-pink-600">
           <UtensilsCrossed size={20} />
           <span>Ice Mankora</span>
         </div>
 
-        {/* DERECHA: Usuario + Tema (Integrados) */}
         <div className="flex items-center gap-2">
-          {/* Ya no hay ModeToggle aquí afuera */}
-
           <OrderSummary />
 
           <DropdownMenu>
@@ -127,7 +115,6 @@ const MozoLayout = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-56">
-              {/* Información del Usuario */}
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">
@@ -141,7 +128,6 @@ const MozoLayout = () => {
 
               <DropdownMenuSeparator />
 
-              {/* --- SUBMENÚ DE TEMA (NUEVO) --- */}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -165,11 +151,9 @@ const MozoLayout = () => {
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>
-              {/* ------------------------------- */}
 
               <DropdownMenuSeparator />
 
-              {/* Botón de Cerrar Sesión */}
               <DropdownMenuItem
                 onClick={logout}
                 className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
@@ -182,7 +166,6 @@ const MozoLayout = () => {
         </div>
       </header>
 
-      {/* --- CONTENIDO PRINCIPAL --- */}
       <main className="flex-1 overflow-y-auto p-4 custom-scroll relative">
         <Outlet />
       </main>

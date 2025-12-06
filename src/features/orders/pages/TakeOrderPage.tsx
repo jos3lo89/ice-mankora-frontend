@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { ProductModal } from "../components/ProductModal";
-import { OrderSummary } from "../components/OrderSummary";
 import { useCartStore } from "@/stores/useCartStore";
 import type { Product } from "../types/catalog.types";
 import SpinnerLoading from "@/components/SpinnerLoading";
@@ -161,8 +160,6 @@ export default function TakeOrderPage() {
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
       />
-
-      <OrderSummary />
     </div>
   );
 }
