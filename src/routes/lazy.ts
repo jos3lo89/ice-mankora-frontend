@@ -15,3 +15,11 @@ export const DashboardAdminPage = lazy(
 export const TakeOrderPage = lazy(
   () => import("@/features/orders/pages/TakeOrderPage")
 );
+
+export const DashboardCajaPage = lazy(
+  () => import("@/features/caja/pages/DashboardPage")
+);
+
+export const UserProfile = lazy(
+  () => import("@/features/users/pages/UserProfile")
+);
