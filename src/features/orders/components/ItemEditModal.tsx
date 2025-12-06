@@ -1,22 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type {
   CartItem,
   ProductVariant,
 } from "@/features/orders/types/catalog.types";
 import { useCartStore } from "@/stores/useCartStore";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { MinusIcon, PlusIcon } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button"; // Botones normales de shadcn
+import { Checkbox } from "@/components/ui/checkbox"; // Checkbox normal
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { MinusIcon, PlusIcon, X } from "lucide-react";
 
 interface ItemEditModalProps {
   item: CartItem;
@@ -33,6 +26,25 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
   const [variants, setVariants] = useState<ProductVariant[]>(
     item.selectedVariants
   );
+  const [mounted, setMounted] = useState(false);
+
+  // Necesario para el Portal (asegura que el componente esté montado en cliente)
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [open]);
 
   const toggleVariant = (v: ProductVariant) => {
     setVariants((prev) =>
@@ -51,52 +63,82 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
     onClose();
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent
-        className="max-w-md"
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <DialogHeader>
-          <DialogTitle>Editar producto</DialogTitle>
-          <DialogDescription></DialogDescription>
-        </DialogHeader>
+  // Si no está abierto o no está montado, no renderizamos nada
+  if (!open || !mounted) return null;
 
+  // Usamos createPortal para "teletransportar" este HTML al final del body
+  // Esto garantiza que esté visualmente ENCIMA del Sheet (que tiene z-index 50)
+  return createPortal(
+    <div className="fixed inset-0 z-9999 flex items-center justify-center">
+      {/* 1. EL FONDO (BACKDROP) */}
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+        onClick={onClose} // Cerrar al hacer clic fuera
+      />
+
+      {/* 2. EL CONTENIDO DEL MODAL */}
+      <div
+        className="relative z-50 w-full max-w-md gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg animate-in zoom-in-95 fade-in mx-4"
+        onClick={(e) => e.stopPropagation()} // IMPORTANTE: Evita que el clic dentro cierre el modal
+      >
+        {/* Cabecera visual (imitando DialogHeader) */}
+        <div className="flex flex-col space-y-1.5 text-center sm:text-left mb-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold leading-none tracking-tight">
+              Editar producto
+            </h2>
+            {/* Botón X para cerrar explícitamente */}
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-900 cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Ajusta los detalles de tu pedido.
+          </p>
+        </div>
+
+        {/* Cuerpo del Modal */}
         <div className="flex items-center justify-center gap-4 my-4">
           <Button
             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="cursor-pointer"
+            className="cursor-pointer h-8 w-8 rounded-full p-0"
+            variant="outline"
           >
-            <MinusIcon />
+            <MinusIcon className="h-4 w-4" />
           </Button>
-          <span className="text-lg font-bold">{quantity}</span>
+          <span className="text-xl font-bold w-8 text-center tabular-nums">
+            {quantity}
+          </span>
           <Button
             onClick={() => setQuantity((q) => q + 1)}
-            className="cursor-pointer"
+            className="cursor-pointer h-8 w-8 rounded-full p-0"
+            variant="outline"
           >
-            <PlusIcon />
+            <PlusIcon className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Variantes */}
         {item.product.variants && item.product.variants.length > 0 && (
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 max-h-[30vh] overflow-y-auto custom-scroll pr-1">
             <Label>Opciones:</Label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               {item.product.variants.map((v) => (
                 <div
                   key={v.id}
-                  className="flex items-center space-x-2 border p-2 rounded"
+                  className="flex items-center space-x-2 border p-3 rounded-md hover:bg-accent/50 transition-colors"
                 >
                   <Checkbox
-                    id={v.id}
+                    id={`modal-${v.id}`} // ID único para evitar conflictos
                     checked={variants.some((s) => s.id === v.id)}
                     onCheckedChange={() => toggleVariant(v)}
                   />
-
                   <label
-                    className="text-sm cursor-pointer flex-1"
-                    htmlFor={v.id}
+                    className="text-sm cursor-pointer flex-1 select-none font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    htmlFor={`modal-${v.id}`}
                   >
                     {v.name} (+ S/ {Number(v.priceExtra).toFixed(2)})
                   </label>
@@ -106,25 +148,37 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
           </div>
         )}
 
-        <div className="space-y-2">
+        <div className="space-y-2 mt-4">
           <Label>Notas de Cocina (Opcional)</Label>
           <Textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Ej: Sin hielo, Poco picante..."
+            className="resize-none min-h-[80px]"
           />
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+        {/* Footer (imitando DialogFooter) */}
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6">
+          <Button variant="outline" onClick={onClose} className="h-10">
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={() => removeItem(item.tempId)}>
+          <Button
+            variant="destructive"
+            onClick={() => removeItem(item.tempId)}
+            className="h-10"
+          >
             Eliminar
           </Button>
-          <Button onClick={handleSave}>Guardar</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <Button
+            onClick={handleSave}
+            className="bg-green-600 hover:bg-green-700 h-10"
+          >
+            Guardar Cambios
+          </Button>
+        </div>
+      </div>
+    </div>,
+    document.body // Aquí le decimos que renderice esto DIRECTAMENTE en el body
   );
 };
