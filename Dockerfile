@@ -35,7 +35,7 @@ RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Exponemos el puerto 3000 (coincide con el nginx.conf)
-EXPOSE 3000
+EXPOSE 4000
 
 # Iniciamos Nginx
 CMD ["nginx", "-g", "daemon off;"]
