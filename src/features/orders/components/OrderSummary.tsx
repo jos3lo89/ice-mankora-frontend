@@ -19,6 +19,7 @@ export const OrderSummary = () => {
   const { items, total, itemCount, removeItem, tableId } = useCartStore();
   const { mutate: sendOrder, isPending } = useCreateOrder();
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const handleSend = () => {
     if (!tableId) return;
@@ -40,7 +41,12 @@ export const OrderSummary = () => {
   return (
     <>
       {/* BOTÓN FLOTANTE DEL CARRITO */}
-      <Sheet>
+      <Sheet
+        open={isSheetOpen}
+        onOpenChange={(open) => {
+          if (!editingItem) setIsSheetOpen(open);
+        }}
+      >
         <SheetTrigger asChild>
           <Button className="fixed bottom-4 right-4 h-16 w-16 cursor-pointer rounded-full shadow-2xl  z-50">
             <div className="relative">
@@ -145,7 +151,7 @@ export const OrderSummary = () => {
       {editingItem && (
         <ItemEditModal
           item={editingItem}
-          open={true}
+          open={!!editingItem}
           onClose={() => setEditingItem(null)}
         />
       )}
