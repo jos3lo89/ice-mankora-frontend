@@ -23,3 +23,11 @@ export const DashboardCajaPage = lazy(
 export const UserProfile = lazy(
   () => import("@/features/users/pages/UserProfile")
 );
+
+export const TableDetailPage = lazy(
+  () => import("@/features/orders/pages/TableDetailPage")
+);
+
+export const SplitBillPage = lazy(
+  () => import("@/features/billing/pages/SplitBillPage")
+);

@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ interface Props {
   onClose: () => void;
   orderId: string;
   totalAmount: number; // Para mostrarlo en el modal
+  itemIds?: string[];
 }
 
 export const PaymentModal = ({
@@ -35,6 +37,7 @@ export const PaymentModal = ({
   onClose,
   orderId,
   totalAmount,
+  itemIds,
 }: Props) => {
   const [step, setStep] = useState<"PAYMENT" | "PRINT">("PAYMENT");
   const [saleId, setSaleId] = useState<string | null>(null);
@@ -81,6 +84,7 @@ export const PaymentModal = ({
       clientName:
         clientName ||
         (docType === ComprobanteType.BOLETA ? "CLIENTE VARIOS" : ""),
+      itemIds,
     });
   };
 
@@ -107,6 +111,7 @@ export const PaymentModal = ({
               <p className="text-2xl font-bold text-primary mt-2">
                 Total: S/ {totalAmount.toFixed(2)}
               </p>
+              <DialogDescription></DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">

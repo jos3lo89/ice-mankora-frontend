@@ -1,5 +1,5 @@
 import { Roles } from "@/enums/roles.enum";
-import { UserPlus, Home } from "lucide-react";
+import { UserPlus, Home, Table } from "lucide-react";
 
 export const organization = {
   name: "Ice Mankora",
@@ -37,8 +37,13 @@ export const sideBarData = {
     [Roles.CAJERO]: [
       {
         title: "Inicio",
-        url: "/",
+        url: "/caja/dashboard",
         icon: Home,
+      },
+      {
+        title: "Mesas",
+        url: "/caja/mesas",
+        icon: Table,
       },
       {
         title: "Caja",

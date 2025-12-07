@@ -24,6 +24,7 @@ export interface CreateSalePayload {
   clientDocNumber?: string;
   clientName?: string;
   clientAddress?: string;
+  itemIds?: string[]; // IDs de OrderItem
 }
 
 export interface SaleResponse {

@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { Suspense } from "react";
 import AuthLayout from "@/layout/AuthLayout";
 import MozoLayout from "@/layout/MozoLayout";
@@ -13,6 +13,8 @@ import {
   FloorMapPage,
   NotFound,
   SignInPage,
+  SplitBillPage,
+  TableDetailPage,
   TakeOrderPage,
   UserProfile,
 } from "./lazy";
@@ -28,22 +30,6 @@ export const router = createBrowserRouter([
 
   {
     element: (
-      <AuthGuard>
-        <RoleGuard allowedRoles={[Roles.ADMIN]}>
-          <AdminLayout />
-        </RoleGuard>
-      </AuthGuard>
-    ),
-    children: [
-      {
-        path: "/admin/dashboard",
-        element: <DashboardAdminPage />,
-      },
-    ],
-  },
-
-  {
-    element: (
       <GuestGuard>
         <AuthLayout />
       </GuestGuard>
@@ -54,6 +40,34 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <SignInPage />
+          </Suspense>
+        ),
+      },
+    ],
+  },
+
+  {
+    element: (
+      <AuthGuard>
+        <RoleGuard allowedRoles={[Roles.ADMIN]}>
+          <AdminLayout />
+        </RoleGuard>
+      </AuthGuard>
+    ),
+    children: [
+      {
+        path: "/admin/dashboard",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <DashboardAdminPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/admin/profile",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <UserProfile />
           </Suspense>
         ),
       },
@@ -96,12 +110,12 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "",
-        element: <Navigate to="dashboard" replace />,
-      },
-      {
         path: "dashboard",
-        element: <DashboardCajaPage />,
+        element: (
+          <Suspense fallback={<Loading />}>
+            <DashboardCajaPage />
+          </Suspense>
+        ),
       },
       {
         path: "map",
@@ -116,6 +130,30 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <UserProfile />
+          </Suspense>
+        ),
+      },
+      {
+        path: "mesas",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <FloorMapPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "table/:id/details",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <TableDetailPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "table/:id/split",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <SplitBillPage />
           </Suspense>
         ),
       },
