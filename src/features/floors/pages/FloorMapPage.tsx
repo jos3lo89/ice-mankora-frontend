@@ -8,12 +8,14 @@ import TableItem from "../components/TableItem";
 import { useNavigate } from "react-router-dom";
 import SpinnerLoading from "@/components/SpinnerLoading";
 import FloorSelector from "../components/FloorSelector";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const FloorMapPage = () => {
   const { data: floors, isLoading, isError } = useFloors();
   const [selectedFloorId, setSelectedFloorId] = useState<string>("");
 
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     if (floors && floors.length > 0 && !selectedFloorId) {
@@ -21,15 +23,73 @@ const FloorMapPage = () => {
     }
   }, [floors, selectedFloorId]);
 
+  // const handleTableClick = (table: Table) => {
+  //   if (table.status === "LIBRE") {
+  //     navigate(
+  //       `/mozo/order/new?tableId=${table.id}&tableName=${table.name}&tableNumber=${table.number}`
+  //     );
+  //   } else if (table.status === "PIDIENDO_CUENTA") {
+  //     toast.warning(`La Mesa ${table.number} quiere pagar.`);
+  //   } else {
+  //     toast.success(`Mesa ${table.number} ocupada. Ver detalle.`);
+  //   }
+  // };
+
+  // --- LÓGICA CORE DE REDIRECCIÓN ---
   const handleTableClick = (table: Table) => {
+    if (!user) return;
+
+    // 1. Definir prefijo de URL según el rol
+    // Si es ADMIN, decidimos que actúe como CAJERO por defecto en el mapa, o como prefieras.
+    const rolePrefix = user.role === "MOZO" ? "/mozo" : "/caja";
+
+    // --- CASO 1: MESA LIBRE (VERDE) ---
     if (table.status === "LIBRE") {
+      // Ambos roles pueden abrir una mesa nueva
       navigate(
-        `/mozo/order/new?tableId=${table.id}&tableName=${table.name}&tableNumber=${table.number}`
+        `${rolePrefix}/order/new?tableId=${
+          table.id
+        }&tableName=${encodeURIComponent(table.name)}&tableNumber=${
+          table.number
+        }`
       );
-    } else if (table.status === "PIDIENDO_CUENTA") {
-      toast.warning(`La Mesa ${table.number} quiere pagar.`);
-    } else {
-      toast.success(`Mesa ${table.number} ocupada. Ver detalle.`);
+      return;
+    }
+
+    // --- CASO 2: MESA OCUPADA (ROJA) ---
+    if (table.status === "OCUPADA") {
+      // Redirigimos a una página de "Gestión de Mesa" (TableDetail)
+      // Esta página tendrá opciones para: Agregar Items, Pre-cuenta, Liberar (si es admin/caja)
+      navigate(
+        `${rolePrefix}/table/${table.id}/details?tableName=${
+          table.name
+        }&tableNumber=${table.number}&piso=${
+          floors?.find((floor) => floor.id === selectedFloorId)?.name
+        }`
+      );
+      return;
+    }
+
+    // --- CASO 3: PIDIENDO CUENTA (AMARILLA) ---
+    if (table.status === "PIDIENDO_CUENTA") {
+      if (user.role === "MOZO") {
+        toast.info(
+          `La Mesa ${table.number} está esperando el cobro. Avisa a Caja.`
+        );
+      } else {
+        // ROL: CAJERO o ADMIN -> Acción: COBRAR
+        // Opción A: Redirigir a la pantalla de detalles/facturación
+        // navigate(`${rolePrefix}/table/${table.id}/details?action=pay`);
+
+        // Opción B (Más rápida): Abrir Modal de Pago aquí mismo si tenemos el orderId
+        // NOTA: Como la tabla 'table' del endpoint /floors a veces no trae el orderId,
+        // lo ideal es ir a la página de detalles que carga la orden.
+        // Pero si tu backend manda el activeOrderId en la mesa, úsalo aquí:
+
+        // toast.success("Abriendo caja para cobrar...");
+        navigate(`${rolePrefix}/table/${table.id}/details?action=pay`);
+      }
+      return;
     }
   };
 
