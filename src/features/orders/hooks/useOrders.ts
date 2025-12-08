@@ -22,7 +22,7 @@ export const useRequestPreCount = () => {
   return useMutation({
     mutationFn: requestPreAccount,
     onSuccess: () => {
-      toast.success("Pre-cuenta solicitada. Mesa en Amarillo.");
+      toast.success("Pre-cuenta solicitada.");
       queryClient.invalidateQueries({ queryKey: ["floors"] });
     },
   });

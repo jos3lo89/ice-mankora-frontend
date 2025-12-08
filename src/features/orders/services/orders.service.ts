@@ -1,6 +1,6 @@
 import axiosInstance from "@/lib/axios";
 import type { Category, Product } from "../types/catalog.types";
-import type { Order } from "../types/order.types";
+import type { Order, PrintLog } from "../types/order.types";
 
 export const getCategories = async (): Promise<Category[]> => {
   const { data } = await axiosInstance.get("/catalog/categories");
@@ -69,5 +69,21 @@ export const cancelOrder = async ({
     reason,
     authCode,
   });
+  return data;
+};
+
+// ✅ NUEVO: Obtener logs de impresión
+export const getOrderPrintLogs = async (orderId: string) => {
+  const { data } = await axiosInstance.get<PrintLog[]>(
+    `/orders/${orderId}/print-logs`
+  );
+  return data;
+};
+
+// ✅ NUEVO: Reintentar impresión
+export const retryPrint = async (printLogId: string) => {
+  const { data } = await axiosInstance.post(
+    `/orders/print-logs/${printLogId}/retry`
+  );
   return data;
 };

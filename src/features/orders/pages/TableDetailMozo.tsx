@@ -18,6 +18,8 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import { useState } from "react";
+import { PreCuentaModal } from "../components/PreCuentaModal";
 
 const TableDetailMozo = () => {
   const { id: tableId } = useParams();
@@ -25,6 +27,7 @@ const TableDetailMozo = () => {
   const navigate = useNavigate();
   const tableName = searchParams.get("tableName");
   const piso = searchParams.get("piso");
+  const [showPreCuentaModal, setShowPreCuentaModal] = useState(false);
 
   const { data: order, isLoading, isError } = useActiveOrder(tableId!);
   const { mutate: preCount, isPending: loadingPreCount } = useRequestPreCount();
@@ -61,9 +64,16 @@ const TableDetailMozo = () => {
     );
   }
   const handlePreAccount = () => {
-    if (confirm("¿Solicitar pre-cuenta y cambiar estado a amarillo?")) {
-      preCount(order.id);
-    }
+    setShowPreCuentaModal(true); // Ya no usa confirm()
+  };
+
+  // Nueva función para confirmar
+  const handleConfirmPreAccount = () => {
+    preCount(order.id, {
+      onSuccess: () => {
+        setShowPreCuentaModal(false);
+      },
+    });
   };
 
   const handleAddItems = () => {
@@ -238,6 +248,16 @@ const TableDetailMozo = () => {
           </CardFooter>
         </Card>
       </div>
+
+      {order && (
+        <PreCuentaModal
+          open={showPreCuentaModal}
+          onClose={() => setShowPreCuentaModal(false)}
+          order={order}
+          onConfirm={handleConfirmPreAccount}
+          isLoading={loadingPreCount}
+        />
+      )}
     </>
   );
 };
