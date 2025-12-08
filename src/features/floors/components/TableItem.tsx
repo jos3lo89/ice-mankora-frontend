@@ -19,12 +19,12 @@ const TableItem = ({ table, onClick }: Props) => {
     <button
       onClick={() => onClick(table)}
       className={cn(
-        "rounded-xl shadow-md transition-all transform hover:scale-105 flex flex-col items-center justify-center p-4 w-32 h-32",
+        "rounded-xl shadow-md transition-all transform cursor-pointer hover:scale-105 flex flex-col items-center justify-center p-4 w-20 h-20",
         statusColor[table.status]
       )}
     >
-      <span className="text-2xl font-bold">{table.number}</span>
-      <span className="text-xs uppercase font-semibold mt-1">
+      <span className="text-xl font-bold">{table.number}</span>
+      <span className="text-xs uppercase font-normal mt-1">
         {table.status.replace("_", " ")}
       </span>
     </button>

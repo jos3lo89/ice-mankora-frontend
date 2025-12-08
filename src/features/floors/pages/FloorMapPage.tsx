@@ -23,29 +23,12 @@ const FloorMapPage = () => {
     }
   }, [floors, selectedFloorId]);
 
-  // const handleTableClick = (table: Table) => {
-  //   if (table.status === "LIBRE") {
-  //     navigate(
-  //       `/mozo/order/new?tableId=${table.id}&tableName=${table.name}&tableNumber=${table.number}`
-  //     );
-  //   } else if (table.status === "PIDIENDO_CUENTA") {
-  //     toast.warning(`La Mesa ${table.number} quiere pagar.`);
-  //   } else {
-  //     toast.success(`Mesa ${table.number} ocupada. Ver detalle.`);
-  //   }
-  // };
-
-  // --- LÓGICA CORE DE REDIRECCIÓN ---
   const handleTableClick = (table: Table) => {
     if (!user) return;
 
-    // 1. Definir prefijo de URL según el rol
-    // Si es ADMIN, decidimos que actúe como CAJERO por defecto en el mapa, o como prefieras.
     const rolePrefix = user.role === "MOZO" ? "/mozo" : "/caja";
 
-    // --- CASO 1: MESA LIBRE (VERDE) ---
     if (table.status === "LIBRE") {
-      // Ambos roles pueden abrir una mesa nueva
       navigate(
         `${rolePrefix}/order/new?tableId=${
           table.id
@@ -56,10 +39,17 @@ const FloorMapPage = () => {
       return;
     }
 
-    // --- CASO 2: MESA OCUPADA (ROJA) ---
     if (table.status === "OCUPADA") {
-      // Redirigimos a una página de "Gestión de Mesa" (TableDetail)
-      // Esta página tendrá opciones para: Agregar Items, Pre-cuenta, Liberar (si es admin/caja)
+      if (rolePrefix === "/mozo") {
+        navigate(
+          `${rolePrefix}/table/${table.id}/detail?tableName=${
+            table.name
+          }&tableNumber=${table.number}&piso=${
+            floors?.find((floor) => floor.id === selectedFloorId)?.name
+          }`
+        );
+        return;
+      }
       navigate(
         `${rolePrefix}/table/${table.id}/details?tableName=${
           table.name
@@ -67,6 +57,7 @@ const FloorMapPage = () => {
           floors?.find((floor) => floor.id === selectedFloorId)?.name
         }`
       );
+
       return;
     }
 
@@ -110,13 +101,14 @@ const FloorMapPage = () => {
 
           {floors.map((floor) => (
             <TabsContent key={floor.id} value={floor.id}>
-              <Card className="p-6">
+              <Card className="p-5">
                 {floor.tables.length === 0 ? (
                   <p className="text-center text-muted-foreground">
                     No hay mesas en este piso.
                   </p>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  // <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+                  <div className="flex flex-wrap gap-2 justify-center">
                     {floor.tables.map((table) => (
                       <TableItem
                         key={table.id}

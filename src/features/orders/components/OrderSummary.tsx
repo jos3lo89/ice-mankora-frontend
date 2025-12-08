@@ -14,24 +14,39 @@ import { useCartStore } from "@/stores/useCartStore";
 import { useCreateOrder } from "../hooks/useCatalog";
 import { Badge } from "@/components/ui/badge";
 import { InlineCartEditor } from "./InlineCartEditor";
+import { useAddItems } from "../hooks/useOrders";
+import { useSearchParams } from "react-router-dom";
 
 export const OrderSummary = () => {
   const { items, total, itemCount, removeItem, table } = useCartStore();
   const { mutate: sendOrder, isPending } = useCreateOrder();
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const { mutate: addItems } = useAddItems();
+
+  const existingOrderId = searchParams.get("orderId");
 
   const handleSend = () => {
-    if (!table?.id) return;
-    const payload = {
-      tableId: table.id,
-      items: items.map((item) => ({
-        productId: item.product.id,
-        quantity: item.quantity,
-        notes: item.notes,
-        variantsDetail: item.variantsDetailString,
-      })),
-    };
-    sendOrder(payload);
+    const itemsPayload = items.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity,
+      notes: item.notes,
+      variantIds: item.selectedVariants.map((v) => v.id),
+    }));
+
+    if (existingOrderId) {
+      addItems({
+        orderId: existingOrderId,
+        items: itemsPayload,
+      });
+    } else {
+      if (!table?.id) return;
+      const payload = {
+        tableId: table.id,
+        items: itemsPayload,
+      };
+      sendOrder(payload);
+    }
   };
 
   if (itemCount() === 0) return null;

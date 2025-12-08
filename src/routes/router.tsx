@@ -14,6 +14,7 @@ import {
   NotFound,
   SignInPage,
   SplitBillPage,
+  TableDetailMozo,
   TableDetailPage,
   TakeOrderPage,
   UserProfile,
@@ -95,6 +96,15 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <TakeOrderPage />
+          </Suspense>
+        ),
+      },
+
+      {
+        path: "table/:id/detail",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <TableDetailMozo />
           </Suspense>
         ),
       },

@@ -22,7 +22,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useDroppable } from "@dnd-kit/core"; // Importante para columnas vacías
+import { useDroppable } from "@dnd-kit/core";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,26 +32,22 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Plus,
-  GripVertical,
-  MoreVertical,
-  Printer,
-  AlertTriangle,
-  Trash2,
-} from "lucide-react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Plus, GripVertical, MoreVertical, Printer, Info } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PaymentModal } from "../components/PaymentModal";
 import SpinnerLoading from "@/components/SpinnerLoading";
 import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 function SortableItem({ id, item }: { id: string; item: any }) {
   const {
@@ -69,37 +65,81 @@ function SortableItem({ id, item }: { id: string; item: any }) {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const hasDetails = item.notes || item.variantsDetail;
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center justify-between p-3 mb-2  rounded-lg border shadow-sm group touch-none"
+      className="flex items-center justify-between p-3 mb-2 rounded-lg border shadow-sm group touch-none relative custom-scroll"
     >
-      <div className="flex items-center gap-3 overflow-hidden">
+      <div className="flex items-center gap-3 overflow-hidden flex-1">
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab hover:text-primary text-muted-foreground active:cursor-grabbing"
+          className="cursor-grab hover:text-primary text-muted-foreground active:cursor-grabbing p-1"
         >
-          <GripVertical size={25} />
+          <GripVertical size={20} />
         </button>
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{item.product.name}</p>
-          <div className="flex gap-2 text-xs text-muted-foreground items-center">
-            <Badge variant="outline" className="h-5 px-1 shrink-0">
-              {item.quantity} un
-            </Badge>
-            {item.notes && (
-              <span className="text-orange-500 truncate max-w-[120px]">
-                {item.notes}
-              </span>
-            )}
 
-            {item.variantsDetail}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <div className="flex items-center gap-2">
+            <Badge
+              variant="secondary"
+              className="h-5 px-1.5 text-[10px] shrink-0 font-bold"
+            >
+              {item.quantity}
+            </Badge>
+            <p className="font-medium text-sm truncate leading-tight">
+              {item.product.name}
+            </p>
           </div>
+
+          {hasDetails && (
+            <div className="mt-1">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    className="cursor-pointer flex items-center gap-1 text-[12px] hover:underline focus:outline-none"
+                    onPointerDown={(e) => e.stopPropagation()}
+                  >
+                    <Info size={12} />
+                    Ver detalles / notas
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-64 p-3 text-sm shadow-xl"
+                  side="right"
+                  align="start"
+                >
+                  <div className="space-y-2">
+                    <h4 className="font-semibold border-b pb-1 text-xs text-muted-foreground uppercase">
+                      Detalles del Item
+                    </h4>
+                    {item.variantsDetail && (
+                      <div className="grid grid-cols-[16px_1fr] gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5" />
+                        <p className="text-xs">{item.variantsDetail}</p>
+                      </div>
+                    )}
+                    {item.notes && (
+                      <div className="grid grid-cols-[16px_1fr] gap-1 text-secondary">
+                        <p className="text-xs">
+                          <span className="font-bold text-primary">NOTA: </span>
+                          {item.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
         </div>
       </div>
-      <span className="font-semibold text-sm font-mono shrink-0 ml-2">
+
+      {/* Precio */}
+      <span className="font-bold text-sm font-mono shrink-0 ml-3 text-right">
         S/ {(Number(item.price) * item.quantity).toFixed(2)}
       </span>
     </div>
@@ -115,26 +155,26 @@ function DroppableContainer({
 }) {
   const { setNodeRef } = useDroppable({ id });
   return (
-    <CardContent
-      ref={setNodeRef}
-      className="flex-1 p-2 mx-1 mb-1 overflow-hidden flex flex-col min-h-[100px]"
-    >
-      {children}
-    </CardContent>
+    <ScrollArea className="h-56 w-full rounded-md pr-2">
+      <CardContent
+        ref={setNodeRef}
+        className="flex-1 p-2 mx-1 mb-1 flex flex-col border border-secondary rounded-lg"
+      >
+        {children}
+      </CardContent>
+      <ScrollBar orientation="vertical" />
+    </ScrollArea>
   );
 }
 
 export default function SplitBillPage() {
   const { id: tableId } = useParams();
-  // const navigate = useNavigate();
   const { data: order, isLoading } = useActiveOrder(tableId!);
 
-  // Estado local
   const [columns, setColumns] = useState<{ [key: string]: any[] }>({});
   const [columnOrder, setColumnOrder] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Estado Modal Pago
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [activePaymentGroup, setActivePaymentGroup] = useState<{
     id: string;
@@ -142,20 +182,26 @@ export default function SplitBillPage() {
     itemIds: string[];
   } | null>(null);
 
-  // Inicializar
   useEffect(() => {
-    if (order && Object.keys(columns).length === 0) {
-      setColumns({ "cuenta-principal": order.items });
-      setColumnOrder(["cuenta-principal"]);
-    }
+    // console.log(order);
+
+    if (!order) return;
+
+    setColumns((prev) => {
+      if (Object.keys(prev).length > 0) return prev;
+      return { "cuenta-principal": order.items };
+    });
+
+    setColumnOrder((prev) => {
+      if (prev.length > 0) return prev;
+      return ["cuenta-principal"];
+    });
   }, [order]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), // Distancia mínima para evitar clicks accidentales
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor)
   );
-
-  // --- LÓGICA DRAG & DROP ---
 
   const findContainer = (id: string) => {
     if (id in columns) return id;
@@ -168,7 +214,6 @@ export default function SplitBillPage() {
     setActiveId(event.active.id as string);
   };
 
-  // CRÍTICO: Mover ítems ENTRE columnas MIENTRAS arrastras
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     const overId = over?.id;
@@ -194,10 +239,8 @@ export default function SplitBillPage() {
 
       let newIndex;
       if (overId in prev) {
-        // Estamos sobre el contenedor vacío (o el contenedor mismo)
         newIndex = overItems.length + 1;
       } else {
-        // Estamos sobre otro ítem
         const isBelowOverItem =
           over &&
           active.rect.current.translated &&
@@ -227,7 +270,6 @@ export default function SplitBillPage() {
     const overContainer = over ? findContainer(over.id as string) : null;
 
     if (activeContainer && overContainer && activeContainer === overContainer) {
-      // Reordenar DENTRO de la misma columna
       const activeIndex = columns[activeContainer].findIndex(
         (i) => i.id === active.id
       );
@@ -249,8 +291,6 @@ export default function SplitBillPage() {
 
     setActiveId(null);
   };
-
-  // --- LÓGICA NEGOCIO ---
 
   const addAccount = () => {
     const newId = `cuenta-${columnOrder.length + 1}`;
@@ -293,26 +333,9 @@ export default function SplitBillPage() {
 
   return (
     <div>
-      {/* HEADER */}
       <div className="pb-2 flex justify-between items-center">
         <h1 className="font-bold text-lg">Dividir Cuenta</h1>
         <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="destructive" size="sm" className="gap-2">
-                <AlertTriangle /> Opciones
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Acciones de Riesgo</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => toast.error("Funcionalidad pendiente")}
-              >
-                <Trash2 /> Se fue sin pagar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
           <Button onClick={addAccount} size="sm" className="gap-2 ">
             <Plus />
             <span className="hidden sm:inline">Nueva Cuenta</span>
@@ -327,97 +350,116 @@ export default function SplitBillPage() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex-1 overflow-x-auto p-4 sm:p-6 flex gap-6 items-start h-full box-border">
-          {columnOrder.map((columnId) => {
-            const items = columns[columnId];
-            const total = items.reduce(
-              (acc: number, item: any) =>
-                acc + Number(item.price) * item.quantity,
-              0
-            );
+        <div className="w-full">
+          <ScrollArea>
+            <div className="min-w-full flex gap-2 pb-3 sm:max-w-sm">
+              {columnOrder.map((columnId) => {
+                const items = columns[columnId];
+                const total = items.reduce(
+                  (acc: number, item: any) =>
+                    acc + Number(item.price) * item.quantity,
+                  0
+                );
 
-            return (
-              <Card
-                key={columnId}
-                className="w-[300px] sm:w-[350px] min-w-[300px] flex flex-col h-full max-h-[calc(100vh-100px)]"
-              >
-                <CardHeader className="flex flex-row items-center justify-between shrink-0">
-                  <CardTitle className="text-base capitalize ">
-                    {columnId.replace("-", " ")}
-                  </CardTitle>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical size={16} />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() => toast.info("Pre-cuenta parcial...")}
-                      >
-                        <Printer className="mr-2 h-4 w-4" /> Pre-cuenta
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardHeader>
+                const Subtotal = (total / 1.18).toFixed(2);
 
-                <div className="flex justify-between items-center px-6 text-xs text-muted-foreground font-medium shrink-0">
-                  <span>Productos</span>
-                  <span>{items.length} items</span>
-                </div>
+                const totalIgv = (total - total / 1.18).toFixed(2);
 
-                <SortableContext
-                  id={columnId}
-                  items={items.map((i: any) => i.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <DroppableContainer id={columnId}>
-                    <ScrollArea className="h-72 w-full rounded-md pr-2">
-                      <div className="space-y-2 p-1 min-h-[50px]">
-                        {items.length === 0 ? (
-                          <div className="h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground text-xs">
-                            Arrastra productos aquí
-                          </div>
-                        ) : (
-                          items.map((item: any) => (
-                            <SortableItem
-                              key={item.id}
-                              id={item.id}
-                              item={item}
-                            />
-                          ))
-                        )}
-                      </div>
-                    </ScrollArea>
-                  </DroppableContainer>
-                </SortableContext>
-
-                <CardFooter className="pt-4 border-t flex-col gap-3 pb-6 shrink-0">
-                  <div className="flex justify-between w-full text-lg font-bold">
-                    <span>Total</span>
-                    <span>S/ {total.toFixed(2)}</span>
-                  </div>
-                  <Button
-                    className="w-full cursor-pointer"
-                    variant={total > 0 ? "default" : "secondary"}
-                    disabled={total === 0}
-                    onClick={() => handlePayGroup(columnId)}
+                return (
+                  <Card
+                    key={columnId}
+                    className="w-[300px] sm:w-[350px] min-w-[300px] flex flex-col h-full max-h-[calc(100vh-220px)]"
                   >
-                    Cobrar Cuenta
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
+                    <CardHeader className="flex flex-row items-center justify-between shrink-0">
+                      <CardTitle className="text-base capitalize ">
+                        {columnId.replace("-", " ")}
+                      </CardTitle>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical size={16} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => toast.info("Pre-cuenta parcial...")}
+                          >
+                            <Printer className="mr-2 h-4 w-4" /> Pre-cuenta
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </CardHeader>
 
+                    <div className="flex justify-between items-center px-6 text-xs text-muted-foreground font-medium shrink-0">
+                      <span>Productos</span>
+                      <span>{items.length} items</span>
+                    </div>
+
+                    <SortableContext
+                      id={columnId}
+                      items={items.map((i: any) => i.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <DroppableContainer id={columnId}>
+                        <div className="space-y-2 p-1 min-h-[50px]">
+                          {items.length === 0 ? (
+                            <div className="h-24 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground text-xs">
+                              Arrastra productos aquí
+                            </div>
+                          ) : (
+                            items.map((item: any) => (
+                              <SortableItem
+                                key={item.id}
+                                id={item.id}
+                                item={item}
+                              />
+                            ))
+                          )}
+                        </div>
+                      </DroppableContainer>
+                    </SortableContext>
+
+                    <CardFooter className="pt-4 border-t flex-col gap-3 pb-6 shrink-0">
+                      <div className="w-full space-y-2">
+                        <div className="flex justify-between items-center text-sm font-mono">
+                          <span>Sub Total</span>
+                          <span>S/ {Subtotal}</span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm font-mono">
+                          <span>IGV (18%)</span>
+                          <span>S/ {totalIgv}</span>
+                        </div>
+
+                        {/* <div className="flex justify-between items-center text-sm font-mono">
+                          <span>Total</span>
+                          <span>S/ {total.toFixed(2)}</span>
+                        </div> */}
+                      </div>
+
+                      <Button
+                        className="w-full cursor-pointer"
+                        variant={total > 0 ? "default" : "secondary"}
+                        disabled={total === 0}
+                        onClick={() => handlePayGroup(columnId)}
+                      >
+                        Pagar
+                        <span>S/ {total.toFixed(2)}</span>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
         <DragOverlay dropAnimation={dropAnimation}>
           {activeId ? (
             <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-2xl border w-[300px] opacity-90 cursor-grabbing">
-              {/* Renderizamos una versión "flotante" del item para feedback visual */}
               <div className="flex items-center gap-3">
                 <GripVertical size={18} />
-                <p className="font-bold">Moviendo producto...</p>
+                <p className="font-bold">Moviendo item...</p>
               </div>
             </div>
           ) : null}

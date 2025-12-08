@@ -5,6 +5,5 @@ export const useFloors = () => {
   return useQuery({
     queryKey: ["floors"],
     queryFn: getFloors,
-    staleTime: 1000 * 60 * 5,
   });
 };
