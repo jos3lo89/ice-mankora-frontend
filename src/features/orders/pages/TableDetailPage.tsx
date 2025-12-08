@@ -18,12 +18,14 @@ import {
   ArrowLeft,
   MapPin,
   Trash2,
+  Printer,
 } from "lucide-react";
 import SpinnerLoading from "@/components/SpinnerLoading";
 import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { useState, useEffect } from "react";
 import { useActiveOrder, useRequestPreCount } from "../hooks/useOrders";
 import { CancelOrderDialog } from "../components/CancelOrderDialog";
+import { PrintLogsModal } from "../components/PrintLogsModal";
 
 const TableDetailPage = () => {
   const { id: tableId } = useParams();
@@ -41,6 +43,7 @@ const TableDetailPage = () => {
 
   const { data: order, isLoading, isError } = useActiveOrder(tableId!);
   const { mutate: preCount, isPending: loadingPreCount } = useRequestPreCount();
+  const [showPrintLogs, setShowPrintLogs] = useState(false);
 
   useEffect(() => {
     if (action === "pay" && order && !paymentOpen) {
@@ -144,6 +147,13 @@ const TableDetailPage = () => {
 
               {(user?.role === "CAJERO" || user?.role === "ADMIN") && (
                 <>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPrintLogs(true)}
+                    className="gap-2"
+                  >
+                    <Printer size={16} />
+                  </Button>
                   <Button
                     variant="destructive"
                     className=""
@@ -280,6 +290,11 @@ const TableDetailPage = () => {
             onClose={() => setCancelOpen(false)}
             orderId={order.id}
             tableNumber={Number(tableNumber)}
+          />
+          <PrintLogsModal
+            orderId={order.id}
+            open={showPrintLogs}
+            onClose={() => setShowPrintLogs(false)}
           />
         </>
       )}

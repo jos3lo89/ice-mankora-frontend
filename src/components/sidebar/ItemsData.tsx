@@ -1,5 +1,5 @@
 import { Roles } from "@/enums/roles.enum";
-import { UserPlus, Home, Table } from "lucide-react";
+import { Home, Table } from "lucide-react";
 
 export const organization = {
   name: "Ice Mankora",
@@ -20,18 +20,18 @@ export const sideBarData = {
         url: "/admin/dashboard",
         icon: Home,
       },
-      {
-        title: "Asistencia",
-        url: "#",
-        icon: UserPlus,
-        isActive: true,
-        items: [
-          {
-            title: "Llamar lista",
-            url: "/attendance/call",
-          },
-        ],
-      },
+      // {
+      //   title: "Asistencia",
+      //   url: "#",
+      //   icon: UserPlus,
+      //   isActive: true,
+      //   items: [
+      //     {
+      //       title: "Llamar lista",
+      //       url: "/attendance/call",
+      //     },
+      //   ],
+      // },
     ],
 
     [Roles.CAJERO]: [
@@ -45,18 +45,18 @@ export const sideBarData = {
         url: "/caja/mesas",
         icon: Table,
       },
-      {
-        title: "Caja",
-        url: "#",
-        icon: UserPlus,
-        isActive: true,
-        items: [
-          {
-            title: "Llamar lista",
-            url: "/attendance/call",
-          },
-        ],
-      },
+      // {
+      //   title: "Caja",
+      //   url: "#",
+      //   icon: UserPlus,
+      //   isActive: true,
+      //   items: [
+      //     {
+      //       title: "Llamar lista",
+      //       url: "/attendance/call",
+      //     },
+      //   ],
+      // },
     ],
 
     [Roles.MOZO]: [

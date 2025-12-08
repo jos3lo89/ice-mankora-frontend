@@ -11,11 +11,19 @@ export interface ProductVariant {
 export interface Product {
   id: string;
   name: string;
+  description: string;
   price: number;
   stockDaily: number;
-  isStockManaged: boolean;
   categoryId: string;
+  isStockManaged: boolean;
+  stockWarehouse: number;
+  taxType: string; // mejorar con enums
+  igvRate: string;
+  codigoSunat: string | null;
+  isActive: boolean;
   variants: ProductVariant[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Category {

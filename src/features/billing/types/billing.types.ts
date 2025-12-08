@@ -12,6 +12,7 @@ export const PaymentMethod = {
   TARJETA: "TARJETA",
   YAPE: "YAPE",
   PLIN: "PLIN",
+  TRANSFERENCIA: "TRANSFERENCIA",
 } as const;
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
@@ -20,19 +21,28 @@ export interface CreateSalePayload {
   orderId: string;
   type: ComprobanteType;
   paymentMethod: PaymentMethod;
-  clientDocType?: string; // "1" (DNI), "6" (RUC)
+
+  // ✅ Nuevo: Datos de pago
+  montoPagado?: number; // Cuánto entregó el cliente
+  vuelto?: number; // Cuánto se le devuelve
+
+  // Cliente
+  clientDocType?: string; // "1" DNI, "6" RUC
   clientDocNumber?: string;
   clientName?: string;
   clientAddress?: string;
-  itemIds?: string[]; // IDs de OrderItem
+  clientEmail?: string;
+
+  // División de cuenta
+  itemIds?: string[]; // Si es pago parcial
 }
 
 export interface SaleResponse {
   id: string;
-  serie: string;
-  correlativo: number;
   numeroComprobante: string;
-  total: number;
+  type: ComprobanteType;
+  precioVentaTotal: string;
+  fechaEmision: Date;
 }
 
 export interface PrintData {
@@ -45,23 +55,71 @@ export interface PrintData {
   document: {
     type: ComprobanteType;
     number: string;
-    date: string;
+    date: Date;
     currency: string;
   };
   client: {
     name: string;
     doc: string;
+    docType: string;
     address: string;
   };
-  items: {
-    quantity: number;
+  items: Array<{
     description: string;
+    quantity: number;
+    precioUnitario: number;
     totalItem: number;
-  }[];
+  }>;
   totals: {
-    subtotal: number;
-    igv: number;
-    total: number;
+    subtotal: string;
+    igv: string;
+    total: string;
     totalLetters: string;
+  };
+  payment: {
+    method: PaymentMethod;
+    montoPagado?: number;
+    vuelto?: number;
+  };
+  sunat: {
+    hash?: string;
+    status: string;
+  };
+  // ✅ Nuevos campos legales
+  metadata: {
+    cajero: string;
+    mesa: string;
+    orden: string;
+    fecha: string;
+    hora: string;
+  };
+}
+
+// ✅ Tipos para APIs externas
+export interface DNIResponse {
+  estado: boolean;
+  mensaje: string;
+  resultado: {
+    id: string;
+    nombres: string;
+    apellido_paterno: string;
+    apellido_materno: string;
+    nombre_completo: string;
+    codigo_verificacion: string;
+  };
+}
+
+export interface RUCResponse {
+  estado: boolean;
+  mensaje: string;
+  resultado: {
+    id: string;
+    razon_social: string;
+    condicion: string;
+    estado: string;
+    direccion: string;
+    departamento: string;
+    provincia: string;
+    distrito: string;
   };
 }
