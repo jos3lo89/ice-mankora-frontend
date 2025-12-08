@@ -15,5 +15,5 @@ export interface Order {
   status: "PENDIENTE" | "PREPARADO" | "ENTREGADO" | "CANCELADO";
   items: OrderItem[];
   createdAt: string;
-  total?: number; // Calculado o venido del backend
+  total?: number;
 }

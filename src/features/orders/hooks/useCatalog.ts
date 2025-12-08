@@ -29,7 +29,7 @@ export const useCreateOrder = () => {
   return useMutation({
     mutationFn: createOrder,
     onSuccess: () => {
-      toast.success("Pedido enviado a cocina 👨‍🍳");
+      toast.success("Pedido enviado");
       clearCart();
       navigate("/mozo/map");
     },

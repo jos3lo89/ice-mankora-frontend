@@ -1,53 +1,33 @@
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useActiveOrder, useRequestPreCount } from "../hooks/useOrders";
+import SpinnerLoading from "@/components/SpinnerLoading";
+import {
+  ArrowLeft,
+  Clock,
+  MapPin,
+  Receipt,
+  UtensilsCrossed,
+  Plus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  Receipt,
-  DollarSign,
-  Clock,
-  Split,
-  UtensilsCrossed,
-  ArrowLeft,
-  MapPin,
-  Trash2,
-} from "lucide-react";
-import SpinnerLoading from "@/components/SpinnerLoading";
-import { PaymentModal } from "@/features/billing/components/PaymentModal";
-import { useState, useEffect } from "react";
-import { useActiveOrder, useRequestPreCount } from "../hooks/useOrders";
-import { CancelOrderDialog } from "../components/CancelOrderDialog";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
-const TableDetailPage = () => {
+const TableDetailMozo = () => {
   const { id: tableId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuthStore();
-
   const tableName = searchParams.get("tableName");
   const piso = searchParams.get("piso");
-  const tableNumber = searchParams.get("tableNumber");
-
-  const [paymentOpen, setPaymentOpen] = useState(false);
-  const [cancelOpen, setCancelOpen] = useState(false);
-  const action = searchParams.get("action");
 
   const { data: order, isLoading, isError } = useActiveOrder(tableId!);
   const { mutate: preCount, isPending: loadingPreCount } = useRequestPreCount();
-
-  useEffect(() => {
-    if (action === "pay" && order && !paymentOpen) {
-      setPaymentOpen(true);
-    }
-  }, [action, order]);
-
   const totalAmount =
     order?.items.reduce((acc, item) => {
       return acc + Number(item.price) * item.quantity;
@@ -80,12 +60,18 @@ const TableDetailPage = () => {
       </div>
     );
   }
-
   const handlePreAccount = () => {
     if (confirm("¿Solicitar pre-cuenta y cambiar estado a amarillo?")) {
       preCount(order.id);
     }
   };
+
+  const handleAddItems = () => {
+    navigate(
+      `/mozo/order/new?tableId=${tableId}&tableName=${tableName}&orderId=${order.id}`
+    );
+  };
+
   const getStatusVariant = (status: string) => {
     switch (status) {
       case "PENDIENTE":
@@ -105,6 +91,12 @@ const TableDetailPage = () => {
         <div className="bg-card rounded-xl border shadow-sm p-4 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
+              <div>
+                <ArrowLeft
+                  className="w-6 h-6 cursor-pointer text-muted-foreground"
+                  onClick={() => navigate("/mozo/map")}
+                />
+              </div>
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <UtensilsCrossed className="w-6 h-6 text-primary" />
               </div>
@@ -130,45 +122,25 @@ const TableDetailPage = () => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {user?.role === "MOZO" && (
-                <Button
-                  onClick={handlePreAccount}
-                  disabled={loadingPreCount}
-                  variant="outline"
-                  className="gap-2 bg-transparent"
-                >
-                  <Receipt className="w-4 h-4" />
-                  {loadingPreCount ? "Solicitando..." : "Pre-Cuenta"}
-                </Button>
-              )}
-
-              {(user?.role === "CAJERO" || user?.role === "ADMIN") && (
-                <>
-                  <Button
-                    variant="destructive"
-                    className=""
-                    title="Anular / Merma"
-                    onClick={() => setCancelOpen(true)}
-                  >
-                    <Trash2 />
-                  </Button>
-                  <Button
-                    onClick={() => setPaymentOpen(true)}
-                    className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-                  >
-                    <DollarSign className="w-4 h-4" />
-                    Cobrar Mesa
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="gap-2 bg-transparent"
-                    onClick={() => navigate(`/caja/table/${tableId}/split`)}
-                  >
-                    <Split className="w-4 h-4" />
-                    Dividir
-                  </Button>
-                </>
-              )}
+              <Button
+                size="sm"
+                onClick={handleAddItems}
+                className="flex-1 gap-2"
+                variant="secondary"
+              >
+                <Plus className="" />
+                Agregar Pedido
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePreAccount}
+                disabled={loadingPreCount}
+                className="flex-1 gap-2"
+              >
+                <Receipt className="" />
+                {loadingPreCount ? "Solicitando..." : "Pre-Cuenta"}
+              </Button>
             </div>
           </div>
         </div>
@@ -266,25 +238,7 @@ const TableDetailPage = () => {
           </CardFooter>
         </Card>
       </div>
-
-      {(user?.role === "CAJERO" || user?.role === "ADMIN") && (
-        <>
-          <PaymentModal
-            open={paymentOpen}
-            onClose={() => setPaymentOpen(false)}
-            orderId={order.id}
-            totalAmount={totalAmount}
-          />
-          <CancelOrderDialog
-            open={cancelOpen}
-            onClose={() => setCancelOpen(false)}
-            orderId={order.id}
-            tableNumber={Number(tableNumber)}
-          />
-        </>
-      )}
     </>
   );
 };
-
-export default TableDetailPage;
+export default TableDetailMozo;

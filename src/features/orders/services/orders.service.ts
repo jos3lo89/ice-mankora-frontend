@@ -18,7 +18,7 @@ export interface CreateOrderPayload {
     productId: string;
     quantity: number;
     notes?: string;
-    variantsDetail?: string;
+    variantIds?: string[];
   }[];
 }
 
@@ -34,5 +34,40 @@ export const getActiveOrder = async (tableId: string): Promise<Order> => {
 
 export const requestPreAccount = async (orderId: string) => {
   const { data } = await axiosInstance.post(`/orders/${orderId}/pre-count`);
+  return data;
+};
+
+export interface AddItemsPayload {
+  orderId: string;
+  items: {
+    productId: string;
+    quantity: number;
+    notes?: string;
+    variantIds?: string[];
+  }[];
+}
+
+export const addItemsToOrder = async ({ orderId, items }: AddItemsPayload) => {
+  const { data } = await axiosInstance.post(`/orders/${orderId}/add-items`, {
+    items,
+  });
+  return data;
+};
+
+export interface CancelOrderPayload {
+  orderId: string;
+  reason: string;
+  authCode: string;
+}
+
+export const cancelOrder = async ({
+  orderId,
+  reason,
+  authCode,
+}: CancelOrderPayload) => {
+  const { data } = await axiosInstance.patch(`/orders/${orderId}/cancel`, {
+    reason,
+    authCode,
+  });
   return data;
 };

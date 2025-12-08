@@ -13,8 +13,12 @@ const BackButton = ({ to, title }: BackButtonProps) => {
   const handleClick = () => {
     if (to) {
       navigate(to);
-    } else {
+      return;
+    }
+    if (window.history.length > 2) {
       navigate(-1);
+    } else {
+      navigate("/");
     }
   };
 

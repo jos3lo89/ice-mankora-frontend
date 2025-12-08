@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
-export default function TakeOrderPage() {
+const TakeOrderPage = () => {
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
   const tableName = searchParams.get("tableName");
@@ -162,4 +162,6 @@ export default function TakeOrderPage() {
       />
     </div>
   );
-}
+};
+
+export default TakeOrderPage;
