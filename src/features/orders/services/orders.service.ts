@@ -23,7 +23,12 @@ export interface CreateOrderPayload {
 }
 
 export const createOrder = async (payload: CreateOrderPayload) => {
+  console.log("que se envia: ->>>>>", payload);
+
   const { data } = await axiosInstance.post("/orders", payload);
+
+  console.log("retorno de back ->>>>", data);
+
   return data;
 };
 

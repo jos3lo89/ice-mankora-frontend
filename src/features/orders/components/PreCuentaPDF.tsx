@@ -385,8 +385,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   businessInfo: {
-    fontSize: 7,
-    color: "#333",
+    fontSize: 9,
+    color: "#000",
     marginTop: 1,
   },
   // Tipo de documento
@@ -401,15 +401,16 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   documentTypeSubtitle: {
-    fontSize: 7,
-    color: "#666",
+    fontSize: 8,
+    fontWeight: "bold",
+    color: "#000",
   },
   // Info de orden (compacta)
   orderInfo: {
     fontSize: 8,
     marginVertical: 4,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#000",
     borderBottomStyle: "dashed",
     paddingBottom: 4,
   },
@@ -419,7 +420,8 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   orderInfoLabel: {
-    color: "#666",
+    color: "#000",
+    fontWeight: "bold",
   },
   orderInfoValue: {
     fontWeight: "bold",
@@ -430,7 +432,7 @@ const styles = StyleSheet.create({
     fontSize: 7,
     fontWeight: "bold",
     borderBottomWidth: 1,
-    borderBottomColor: "#999",
+    borderBottomColor: "#000",
     paddingBottom: 2,
     marginBottom: 3,
   },
@@ -451,6 +453,8 @@ const styles = StyleSheet.create({
   itemName: {
     flex: 1,
     paddingRight: 2,
+    color: "#000",
+    fontWeight: "bold",
   },
   itemTotal: {
     fontWeight: "bold",
@@ -459,14 +463,16 @@ const styles = StyleSheet.create({
   },
   itemDetails: {
     fontSize: 7,
-    color: "#555",
+    color: "#000",
     marginLeft: "15%",
     marginTop: 1,
+    fontWeight: "bold",
   },
   itemNotes: {
     fontSize: 7,
-    color: "#555",
+    color: "#000",
     fontStyle: "italic",
+    fontWeight: "bold",
     marginLeft: "15%",
     marginTop: 1,
   },
@@ -486,6 +492,8 @@ const styles = StyleSheet.create({
   totals: {
     fontSize: 9,
     marginTop: 4,
+    color: "#000",
+    fontWeight: "bold",
   },
   totalRow: {
     flexDirection: "row",
@@ -493,7 +501,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   totalLabel: {
-    color: "#666",
+    color: "#000",
+    // fontWeight: "bold",
   },
   totalValue: {
     fontWeight: "bold",
@@ -522,12 +531,15 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 7,
-    color: "#666",
+    color: "#000",
+    fontWeight: "bold",
     marginBottom: 1,
   },
   footerThanks: {
     fontSize: 8,
     marginTop: 6,
+    color: "#000",
+    fontWeight: "bold",
   },
 });
 
@@ -575,14 +587,16 @@ export const PreCuentaPDF = ({ order }: PreCuentaPDFProps) => {
         <View style={styles.header}>
           <Text style={styles.businessName}>ICE MANKORA</Text>
           <Text style={styles.floorName}>{floorName}</Text>
-          <Text style={styles.businessInfo}>Jr. Principal 123, Máncora</Text>
-          <Text style={styles.businessInfo}>RUC: 20123456789</Text>
+          <Text style={styles.businessInfo}>
+            Jr. Ramón Castilla con Juan Antonio Trelles 2do Piso
+          </Text>
+          <Text style={styles.businessInfo}>RUC: 20615167755</Text>
         </View>
 
         {/* Tipo de documento */}
         <View style={styles.documentType}>
           <Text style={styles.documentTypeTitle}>PRE-CUENTA</Text>
-          <Text style={styles.documentTypeSubtitle}>TICKET INTERNO</Text>
+          {/* <Text style={styles.documentTypeSubtitle}>TICKET INTERNO</Text> */}
         </View>
 
         {/* Info de la orden */}
@@ -648,9 +662,9 @@ export const PreCuentaPDF = ({ order }: PreCuentaPDFProps) => {
             )}
 
             {/* Notas */}
-            {item.notes && (
+            {/* {item.notes && (
               <Text style={styles.itemNotes}>Nota: {item.notes}</Text>
-            )}
+            )} */}
           </View>
         ))}
 
@@ -677,11 +691,11 @@ export const PreCuentaPDF = ({ order }: PreCuentaPDFProps) => {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerBold}>PRESENTE ESTE TICKET EN CAJA</Text>
-          <Text style={styles.footerText}>
+          <Text style={styles.footerBold}>¡Gracias por su preferencia!</Text>
+          {/* <Text style={styles.footerText}>
             Para solicitar su comprobante oficial
-          </Text>
-          <Text style={styles.footerThanks}>¡Gracias por su preferencia!</Text>
+          </Text> */}
+          <Text style={styles.footerThanks}>VUELVA PRONTO</Text>
         </View>
       </Page>
     </Document>
