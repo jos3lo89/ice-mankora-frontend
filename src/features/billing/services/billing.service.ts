@@ -54,3 +54,5 @@ export const searchRUC = async (ruc: string): Promise<RUCResponse> => {
     throw new Error(error.response?.data?.mensaje || "Error al consultar RUC");
   }
 };
+
+// ernuqwenrqoernoqwenr
