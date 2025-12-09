@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   businessInfo: {
     fontSize: 7,
-    color: "#333",
+    color: "#000",
     marginBottom: 1,
   },
   divider: {

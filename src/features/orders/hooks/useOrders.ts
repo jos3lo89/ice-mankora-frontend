@@ -14,6 +14,13 @@ export const useActiveOrder = (tableId: string) => {
     queryKey: ["active-order", tableId],
     queryFn: () => getActiveOrder(tableId),
     retry: 1,
+    throwOnError: (error: any) => {
+      // Si es 404, no es un error real - la mesa simplemente no tiene orden activa
+      if (error?.response?.status === 404) {
+        return false; // No lanzar error
+      }
+      return true; // Otros errores sí se lanzan
+    },
   });
 };
 
