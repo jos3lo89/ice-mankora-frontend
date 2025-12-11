@@ -1,14 +1,7 @@
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useActiveOrder, useRequestPreCount } from "../hooks/useOrders";
 import SpinnerLoading from "@/components/SpinnerLoading";
-import {
-  ArrowLeft,
-  Clock,
-  MapPin,
-  Receipt,
-  UtensilsCrossed,
-  Plus,
-} from "lucide-react";
+import { ArrowLeft, Clock, MapPin, UtensilsCrossed, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -64,9 +57,9 @@ const TableDetailMozo = () => {
       </div>
     );
   }
-  const handlePreAccount = () => {
-    setShowPreCuentaModal(true); // Ya no usa confirm()
-  };
+  // const handlePreAccount = () => {
+  //   setShowPreCuentaModal(true); // Ya no usa confirm()
+  // };
 
   // Nueva función para confirmar
   const handleConfirmPreAccount = () => {
@@ -142,7 +135,7 @@ const TableDetailMozo = () => {
                 <Plus className="" />
                 Agregar Pedido
               </Button>
-              <Button
+              {/* <Button
                 size="sm"
                 variant="outline"
                 onClick={handlePreAccount}
@@ -151,7 +144,7 @@ const TableDetailMozo = () => {
               >
                 <Receipt className="" />
                 {loadingPreCount ? "Solicitando..." : "Pre-Cuenta"}
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
