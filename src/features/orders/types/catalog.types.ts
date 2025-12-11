@@ -1,3 +1,5 @@
+import type { ProductsI } from "./product.interface";
+
 export interface ProductVariant {
   id: string;
   productId: string;
@@ -17,7 +19,7 @@ export interface Product {
   categoryId: string;
   isStockManaged: boolean;
   stockWarehouse: number;
-  taxType: string; // mejorar con enums
+  taxType: string;
   igvRate: string;
   codigoSunat: string | null;
   isActive: boolean;
@@ -34,7 +36,7 @@ export interface Category {
 
 export interface CartItem {
   tempId: string;
-  product: Product;
+  product: ProductsI;
   quantity: number;
   notes?: string;
   selectedVariants: ProductVariant[];

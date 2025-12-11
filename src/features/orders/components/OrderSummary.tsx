@@ -22,7 +22,7 @@ export const OrderSummary = () => {
   const { mutate: sendOrder, isPending } = useCreateOrder();
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
-  const { mutate: addItems } = useAddItems();
+  const { mutate: addItems, isPending: isPendingItems } = useAddItems();
 
   const existingOrderId = searchParams.get("orderId");
 
@@ -112,7 +112,7 @@ export const OrderSummary = () => {
                   )}
 
                   {item.notes && (
-                    <p className="text-xs text-orange-600 italic mt-1 ml-1">
+                    <p className="text-xs text-secondary italic mt-1 ml-1">
                       Nota: {item.notes}
                     </p>
                   )}
@@ -152,9 +152,9 @@ export const OrderSummary = () => {
             <Button
               className="w-full text-lg cursor-pointer rounded-xl bg-green-600 hover:bg-green-700 h-12"
               onClick={handleSend}
-              disabled={isPending}
+              disabled={isPending || isPendingItems}
             >
-              {isPending ? (
+              {isPending || isPendingItems ? (
                 "Enviando..."
               ) : (
                 <span className="flex items-center gap-2">

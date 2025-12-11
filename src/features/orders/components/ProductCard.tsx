@@ -1,9 +1,9 @@
-import type { Product } from "../types/catalog.types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import type { ProductsI } from "../types/product.interface";
 
 interface Props {
-  product: Product;
+  product: ProductsI;
   onClick: () => void;
 }
 

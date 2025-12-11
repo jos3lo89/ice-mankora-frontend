@@ -1,10 +1,10 @@
 import type {
   CartItem,
-  Product,
   ProductVariant,
 } from "@/features/orders/types/catalog.types";
+import type { ProductsI } from "@/features/orders/types/product.interface";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface Table {
   id: string;
@@ -28,7 +28,7 @@ interface CartState {
   setTable: (table: Table) => void;
 
   addItem: (
-    product: Product,
+    product: ProductsI,
     quantity: number,
     notes: string,
     variants: any[]
@@ -46,7 +46,7 @@ export const useCartStore = create<CartState>()(
       table: null,
       items: [],
 
-      setTable: (table) => set({ table }),
+      setTable: (table: Table) => set({ table }),
 
       addItem: (product, quantity, notes, variants) => {
         const variantsDetailString = variants.map((v) => v.name).join(", ");
@@ -115,10 +115,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "cart-storage",
-      partialize: (state) => ({
-        tableId: state.table?.id,
-        items: state.items,
-      }),
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );
