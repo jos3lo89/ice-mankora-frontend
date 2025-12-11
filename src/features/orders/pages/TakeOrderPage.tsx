@@ -7,7 +7,6 @@ import { Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { ProductModal } from "../components/ProductModal";
 import { useCartStore } from "@/stores/useCartStore";
-import type { Product } from "../types/catalog.types";
 import SpinnerLoading from "@/components/SpinnerLoading";
 import {
   Sheet,
@@ -18,31 +17,33 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import type { ProductsI } from "../types/product.interface";
 
 const TakeOrderPage = () => {
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<ProductsI | null>(
+    null
+  );
+  const [openFilter, setOpenFilter] = useState(false);
+
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
   const tableName = searchParams.get("tableName");
   const tableNumber = searchParams.get("tableNumber");
 
   const { categoriesQuery, productsQuery } = useCatalog();
-  const setStoreTable = useCartStore((state) => state.setTable);
-
-  const [selectedCategory, setSelectedCategory] = useState("ALL");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  const [openFilter, setOpenFilter] = useState(false);
+  const { setTable } = useCartStore();
 
   useEffect(() => {
-    if (tableId) {
-      setStoreTable({
+    if (tableId && tableName && tableNumber) {
+      setTable({
         id: tableId,
-        name: tableName || "",
-        tableNumber: tableNumber || "",
+        name: tableName,
+        tableNumber: tableNumber,
       });
     }
-  }, [tableId, tableName, tableNumber, setStoreTable]);
+  }, [tableId, tableName, tableNumber, setTable]);
 
   const categories = categoriesQuery.data || [];
   const products = productsQuery.data || [];

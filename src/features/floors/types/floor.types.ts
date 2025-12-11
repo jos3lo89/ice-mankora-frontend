@@ -11,6 +11,8 @@ export interface Floor {
   id: string;
   name: string;
   level: number;
+  printerIp: string;
+  printerPort: number;
   createdAt: string;
   updatedAt: string;
   tables: Table[];

@@ -14,11 +14,13 @@ export const useCatalog = () => {
   const categoriesQuery = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
+    staleTime: 5 * 60 * 1000,
   });
 
   const productsQuery = useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
+    staleTime: 5 * 60 * 1000,
   });
 
   return { categoriesQuery, productsQuery };
@@ -26,7 +28,7 @@ export const useCatalog = () => {
 
 export const useCreateOrder = () => {
   const navigate = useNavigate();
-  const clearCart = useCartStore((state) => state.clearCart);
+  const { clearCart } = useCartStore();
   const queryClient = useQueryClient();
 
   return useMutation({

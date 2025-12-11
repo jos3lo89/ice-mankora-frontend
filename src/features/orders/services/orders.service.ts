@@ -1,14 +1,17 @@
 import axiosInstance from "@/lib/axios";
-import type { Category, Product } from "../types/catalog.types";
 import type { Order, PrintLog } from "../types/order.types";
+import type { CategoryI } from "../types/category.interface";
+import type { ProductsI } from "../types/product.interface";
 
-export const getCategories = async (): Promise<Category[]> => {
-  const { data } = await axiosInstance.get("/catalog/categories");
+export const getCategories = async (): Promise<CategoryI[]> => {
+  const { data } = await axiosInstance.get(`/catalog/categories`);
+
   return data;
 };
 
-export const getProducts = async (): Promise<Product[]> => {
-  const { data } = await axiosInstance.get("/catalog/products");
+export const getProducts = async (): Promise<ProductsI[]> => {
+  const { data } = await axiosInstance.get(`/catalog/products`);
+
   return data;
 };
 

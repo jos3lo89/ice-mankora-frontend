@@ -4,18 +4,22 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { toast } from "sonner";
 
 export const useLogin = () => {
-  const setLogin = useAuthStore((state) => state.setLogin);
+  const { setLogin } = useAuthStore();
 
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
       setLogin(data);
-      toast.success(`Bienvenido, ${data.name}`);
+      toast.success(`Bienvenido, ${data.name}`, {
+        position: "top-center",
+      });
     },
     onError: (error: any) => {
       const message =
         error.response?.data?.message || "Error al iniciar sesión";
-      toast.error(message);
+      toast.error(message, {
+        position: "top-center",
+      });
     },
   });
 };

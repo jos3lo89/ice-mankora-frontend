@@ -8,16 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import type { Product } from "../types/catalog.types";
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/useCartStore";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import type { ProductsI } from "../types/product.interface";
 
 interface Props {
-  product: Product | null;
+  product: ProductsI | null;
   open: boolean;
   onClose: () => void;
 }
