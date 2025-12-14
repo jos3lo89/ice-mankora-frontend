@@ -1,5 +1,5 @@
 import { Roles } from "@/enums/roles.enum";
-import { Home, Table } from "lucide-react";
+import { Box, Home, Table } from "lucide-react";
 
 export const organization = {
   name: "Ice Mankora",
@@ -20,18 +20,11 @@ export const sideBarData = {
         url: "/admin/dashboard",
         icon: Home,
       },
-      // {
-      //   title: "Asistencia",
-      //   url: "#",
-      //   icon: UserPlus,
-      //   isActive: true,
-      //   items: [
-      //     {
-      //       title: "Llamar lista",
-      //       url: "/attendance/call",
-      //     },
-      //   ],
-      // },
+      {
+        title: "Productos",
+        url: "/admin/products",
+        icon: Box,
+      },
     ],
 
     [Roles.CAJERO]: [

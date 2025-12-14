@@ -9,7 +9,7 @@ const AdminLayout = () => {
       <AppSidebar />
       <SidebarInset>
         <SideBarNavMenu />
-        <section className="p-4">
+        <section className="p-4 w-full max-w-full overflow-hidden">
           <Outlet />
         </section>
       </SidebarInset>
