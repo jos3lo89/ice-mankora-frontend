@@ -35,3 +35,5 @@ export const SplitBillPage = lazy(
 export const TableDetailMozo = lazy(
   () => import("@/features/orders/pages/TableDetailMozo")
 );
+
+export const ProductsPage = lazy(() => import("@/features/admin/pages/ProductsPage"))

@@ -12,6 +12,7 @@ import {
   DashboardCajaPage,
   FloorMapPage,
   NotFound,
+  ProductsPage,
   SignInPage,
   SplitBillPage,
   TableDetailMozo,
@@ -69,6 +70,15 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <UserProfile />
+          </Suspense>
+        ),
+      },
+
+      {
+        path: "/admin/products",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <ProductsPage />
           </Suspense>
         ),
       },
