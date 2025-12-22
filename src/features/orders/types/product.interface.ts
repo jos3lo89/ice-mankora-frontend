@@ -9,11 +9,11 @@ export interface ProductsI {
   stockWarehouse: number;
   taxType: string;
   igvRate: string;
-  codigoSunat: any;
+  codigoSunat: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  variants: any[];
+  variants: VariantsI[];
   category: Category;
 }
 
@@ -21,4 +21,12 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
+}
+
+export interface VariantsI {
+  id: string;
+  name: string;
+  isActive: boolean;
+  priceExtra: string;
+  productId: string;
 }

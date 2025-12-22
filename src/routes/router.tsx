@@ -8,11 +8,15 @@ import RoleGuard from "@/guards/RoleGuard";
 import RootRedirect from "@/components/RootRedirect";
 import { Roles } from "@/enums/roles.enum";
 import {
+  CashRegisterDetailsPage,
+  CashRegisterPage,
+  CategoriesManagementPage,
   DashboardAdminPage,
   DashboardCajaPage,
   FloorMapPage,
   NotFound,
   ProductsPage,
+  RegisterUserPage,
   SignInPage,
   SplitBillPage,
   TableDetailMozo,
@@ -75,10 +79,43 @@ export const router = createBrowserRouter([
       },
 
       {
+        path: "/admin/register-user",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <RegisterUserPage />
+          </Suspense>
+        ),
+      },
+
+      {
         path: "/admin/products",
         element: (
           <Suspense fallback={<Loading />}>
             <ProductsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/admin/cash-register",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <CashRegisterPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/admin/cash-register/:id",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <CashRegisterDetailsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/admin/categories-management",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <CategoriesManagementPage />
           </Suspense>
         ),
       },
@@ -174,6 +211,22 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <SplitBillPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "cash-register",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <CashRegisterPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "cash-register/:id",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <CashRegisterDetailsPage />
           </Suspense>
         ),
       },

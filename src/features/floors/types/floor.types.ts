@@ -11,22 +11,11 @@ export interface Floor {
   id: string;
   name: string;
   level: number;
-  printerIp: string;
-  printerPort: number;
-  createdAt: string;
-  updatedAt: string;
   tables: Table[];
 }
 
 export interface Table {
   id: string;
   number: number;
-  name: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  floorId: string;
   status: TableStatus;
-  posX: number;
-  posY: number;
 }

@@ -35,6 +35,7 @@ export const useRequestPreCount = () => {
   });
 };
 
+// si se usa
 export const useAddItems = () => {
   const navigate = useNavigate();
   const clearCart = useCartStore((state) => state.clearCart);

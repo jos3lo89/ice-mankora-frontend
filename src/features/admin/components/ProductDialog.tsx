@@ -140,8 +140,8 @@ export function ProductDialog({
           old?.map((p) =>
             p.id === product.id
               ? { ...p, ...values, price: values.price.toString() }
-              : p
-          )
+              : p,
+          ),
         );
       } else {
         // Actualización optimista para creación (agregar temporalmente)
@@ -156,14 +156,13 @@ export function ProductDialog({
           codigoSunat: null,
         };
         queryClient.setQueryData<ProductsI[]>(["admin-products"], (old) =>
-          old ? [...old, tempProduct] : [tempProduct]
+          old ? [...old, tempProduct] : [tempProduct],
         );
       }
 
       return { previousProducts };
     },
     onError: (error, _, context) => {
-      // Revertir el cambio optimista
       console.log(error);
 
       if (context?.previousProducts) {
@@ -171,12 +170,12 @@ export function ProductDialog({
       }
 
       toast.error(
-        `No se pudo ${isEditing ? "actualizar" : "crear"} el producto`
+        `No se pudo ${isEditing ? "actualizar" : "crear"} el producto`,
       );
     },
     onSuccess: () => {
       toast.success(
-        `Producto ${isEditing ? "actualizado" : "creado"} correctamente`
+        `Producto ${isEditing ? "actualizado" : "creado"} correctamente`,
       );
 
       onOpenChange(false);
@@ -189,7 +188,6 @@ export function ProductDialog({
   });
 
   const onSubmit = (values: ProductFormValues) => {
-    console.log("Datos del formulario:", values);
     mutation.mutate(values);
   };
 
@@ -402,8 +400,8 @@ export function ProductDialog({
                 {mutation.isPending
                   ? "Guardando..."
                   : isEditing
-                  ? "Actualizar"
-                  : "Crear Producto"}
+                    ? "Actualizar"
+                    : "Crear Producto"}
               </Button>
             </DialogFooter>
           </form>

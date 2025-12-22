@@ -10,9 +10,6 @@ export const useLogin = () => {
     mutationFn: login,
     onSuccess: (data) => {
       setLogin(data);
-      toast.success(`Bienvenido, ${data.name}`, {
-        position: "top-center",
-      });
     },
     onError: (error: any) => {
       const message =

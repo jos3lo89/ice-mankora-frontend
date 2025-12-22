@@ -18,7 +18,7 @@ const AppSidebar = () => {
   if (!role) navigate("/signin");
 
   return (
-    <Sidebar collapsible="icon" variant="floating">
+    <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
         <Organization />
       </SidebarHeader>

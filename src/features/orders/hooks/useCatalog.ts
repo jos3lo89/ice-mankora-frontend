@@ -9,23 +9,27 @@ import {
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/useCartStore";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 
+// si se usa
 export const useCatalog = () => {
-  const categoriesQuery = useQuery({
+  return useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
     staleTime: 5 * 60 * 1000,
   });
+};
 
-  const productsQuery = useQuery({
+// si se usa
+export const useProducts = () => {
+  return useQuery({
     queryKey: ["products"],
     queryFn: getProducts,
     staleTime: 5 * 60 * 1000,
   });
-
-  return { categoriesQuery, productsQuery };
 };
 
+// si se usa
 export const useCreateOrder = () => {
   const navigate = useNavigate();
   const { clearCart } = useCartStore();
@@ -41,8 +45,12 @@ export const useCreateOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Error al enviar pedido");
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message);
+      } else {
+        toast.error("Error al enviar pedido");
+      }
     },
   });
 };
@@ -69,7 +77,7 @@ export const useRetryPrint = () => {
     },
     onError: (error: any) => {
       toast.error(
-        error.response?.data?.message || "Error al reintentar impresión"
+        error.response?.data?.message || "Error al reintentar impresión",
       );
     },
   });

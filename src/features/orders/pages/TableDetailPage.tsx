@@ -8,7 +8,6 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Receipt,
   DollarSign,
@@ -25,8 +24,9 @@ import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { useState, useEffect } from "react";
 import { useActiveOrder, useRequestPreCount } from "../hooks/useOrders";
 import { CancelOrderDialog } from "../components/CancelOrderDialog";
-import { PrintLogsModal } from "../components/PrintLogsModal";
 import { PreCuentaModal } from "../components/PreCuentaModal";
+import { useCashRegister } from "@/features/caja/hooks/useCashRegister";
+import { OpenCashRegisterModal } from "@/features/caja/components/OpenCashRegisterModal";
 
 const TableDetailPage = () => {
   const { id: tableId } = useParams();
@@ -34,9 +34,13 @@ const TableDetailPage = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
+  const [showOpenModal, setShowOpenModal] = useState(false);
+
+  const { isCashRegisterOpen } = useCashRegister();
+
   const [showPreCuentaModal, setShowPreCuentaModal] = useState(false);
 
-  const tableName = searchParams.get("tableName");
+  // const tableName = searchParams.get("tableName");
   const piso = searchParams.get("piso");
   const tableNumber = searchParams.get("tableNumber");
 
@@ -46,7 +50,6 @@ const TableDetailPage = () => {
 
   const { data: order, isLoading, isError } = useActiveOrder(tableId!);
   const { mutate: preCount, isPending: loadingPreCount } = useRequestPreCount();
-  const [showPrintLogs, setShowPrintLogs] = useState(false);
 
   useEffect(() => {
     if (action === "pay" && order && !paymentOpen) {
@@ -100,7 +103,7 @@ const TableDetailPage = () => {
   // };
 
   const handlePreAccount = () => {
-    setShowPreCuentaModal(true); // Ya no usa confirm()
+    setShowPreCuentaModal(true);
   };
   const handleConfirmPreAccount = () => {
     preCount(order.id, {
@@ -135,7 +138,7 @@ const TableDetailPage = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl font-bold text-foreground">
-                    {tableName}
+                    {`Mesa: ${tableNumber}`}
                   </h1>
                   <Badge
                     variant={getStatusVariant(order.status)}
@@ -194,14 +197,27 @@ const TableDetailPage = () => {
                         <Receipt className="" />
                         {loadingPreCount ? "Solicitando..." : "Pre-Cuenta"}
                       </Button>
-                      <Button
-                        onClick={() => setPaymentOpen(true)}
-                        className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-                        disabled={unpaidItems.length === 0}
-                      >
-                        <DollarSign className="w-4 h-4" />
-                        Cobrar Mesa
-                      </Button>
+
+                      {isCashRegisterOpen ? (
+                        <Button
+                          onClick={() => setPaymentOpen(true)}
+                          className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                          disabled={unpaidItems.length === 0}
+                        >
+                          <DollarSign className="w-4 h-4" />
+                          Cobrar Mesa
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => setShowOpenModal(true)}
+                          className="gap-2"
+                          variant="secondary"
+                        >
+                          <DollarSign className="w-4 h-4" />
+                          Abrir Caja para Cobrar
+                        </Button>
+                      )}
+
                       <Button
                         variant="outline"
                         className="gap-2 bg-transparent"
@@ -320,18 +336,17 @@ const TableDetailPage = () => {
 
           <CardFooter className="flex flex-col p-0 border-t bg-muted/30">
             <div className="w-full p-4 space-y-3">
-              {/* ✅ Mostrar totales solo de items NO PAGADOS */}
               {unpaidItems.length > 0 ? (
                 <>
-                  <div className="flex justify-between text-sm">
+                  {/* <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-mono">
                       Subtotal Pendiente
                     </span>
                     <span className="font-medium font-mono">
                       S/ {(totalAmount / 1.18).toFixed(2)}
                     </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
+                  </div> */}
+                  {/* <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground font-mono">
                       IGV (18%)
                     </span>
@@ -339,7 +354,7 @@ const TableDetailPage = () => {
                       S/ {(totalAmount - totalAmount / 1.18).toFixed(2)}
                     </span>
                   </div>
-                  <Separator />
+                  <Separator /> */}
                   <div className="flex justify-between items-center pt-1">
                     <span className="text-lg font-semibold text-foreground font-mono">
                       Total a Pagar
@@ -365,6 +380,11 @@ const TableDetailPage = () => {
         </Card>
       </div>
 
+      <OpenCashRegisterModal
+        open={showOpenModal}
+        onClose={() => setShowOpenModal(false)}
+      />
+
       {(user?.role === "CAJERO" || user?.role === "ADMIN") && (
         <>
           <PaymentModal
@@ -379,11 +399,6 @@ const TableDetailPage = () => {
             onClose={() => setCancelOpen(false)}
             orderId={order.id}
             tableNumber={Number(tableNumber)}
-          />
-          <PrintLogsModal
-            orderId={order.id}
-            open={showPrintLogs}
-            onClose={() => setShowPrintLogs(false)}
           />
         </>
       )}

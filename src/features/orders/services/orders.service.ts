@@ -3,35 +3,33 @@ import type { Order, PrintLog } from "../types/order.types";
 import type { CategoryI } from "../types/category.interface";
 import type { ProductsI } from "../types/product.interface";
 
+// se usa
 export const getCategories = async (): Promise<CategoryI[]> => {
-  const { data } = await axiosInstance.get(`/catalog/categories`);
-
+  const { data } = await axiosInstance.get<CategoryI[]>(`/catalog/categories`);
   return data;
 };
 
+// se usa
 export const getProducts = async (): Promise<ProductsI[]> => {
-  const { data } = await axiosInstance.get(`/catalog/products`);
-
+  const { data } = await axiosInstance.get<ProductsI[]>(`/catalog/products`);
   return data;
 };
 
 export interface CreateOrderPayload {
   tableId: string;
-  items: {
-    productId: string;
-    quantity: number;
-    notes?: string;
-    variantIds?: string[];
-  }[];
+  items: Item[];
 }
 
+export interface Item {
+  productId: string;
+  quantity: number;
+  notes: string | null;
+  variantIds: string[];
+}
+
+// se usa
 export const createOrder = async (payload: CreateOrderPayload) => {
-  console.log("que se envia: ->>>>>", payload);
-
   const { data } = await axiosInstance.post("/orders", payload);
-
-  console.log("retorno de back ->>>>", data);
-
   return data;
 };
 
@@ -47,12 +45,7 @@ export const requestPreAccount = async (orderId: string) => {
 
 export interface AddItemsPayload {
   orderId: string;
-  items: {
-    productId: string;
-    quantity: number;
-    notes?: string;
-    variantIds?: string[];
-  }[];
+  items: Item[];
 }
 
 export const addItemsToOrder = async ({ orderId, items }: AddItemsPayload) => {
@@ -83,7 +76,7 @@ export const cancelOrder = async ({
 // ✅ NUEVO: Obtener logs de impresión
 export const getOrderPrintLogs = async (orderId: string) => {
   const { data } = await axiosInstance.get<PrintLog[]>(
-    `/orders/${orderId}/print-logs`
+    `/orders/${orderId}/print-logs`,
   );
   return data;
 };
@@ -91,7 +84,7 @@ export const getOrderPrintLogs = async (orderId: string) => {
 // ✅ NUEVO: Reintentar impresión
 export const retryPrint = async (printLogId: string) => {
   const { data } = await axiosInstance.post(
-    `/orders/print-logs/${printLogId}/retry`
+    `/orders/print-logs/${printLogId}/retry`,
   );
   return data;
 };

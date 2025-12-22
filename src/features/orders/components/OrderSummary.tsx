@@ -30,7 +30,7 @@ export const OrderSummary = () => {
     const itemsPayload = items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
-      notes: item.notes,
+      notes: item.notes || null,
       variantIds: item.selectedVariants.map((v) => v.id),
     }));
 

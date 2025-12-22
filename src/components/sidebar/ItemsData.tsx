@@ -1,5 +1,5 @@
 import { Roles } from "@/enums/roles.enum";
-import { Box, Home, Table } from "lucide-react";
+import { Box, BoxIcon, Home, Table, UserPlus } from "lucide-react";
 
 export const organization = {
   name: "Ice Mankora",
@@ -25,6 +25,43 @@ export const sideBarData = {
         url: "/admin/products",
         icon: Box,
       },
+
+      {
+        title: "Usuarios",
+        url: "#",
+        icon: UserPlus,
+        isActive: true,
+        items: [
+          {
+            title: "Registrar Usuario",
+            url: "/admin/register-user",
+          },
+        ],
+      },
+
+      {
+        title: "Caja",
+        url: "#",
+        icon: BoxIcon,
+        items: [
+          {
+            title: "Apertura-cierre de Caja",
+            url: "/admin/cash-register",
+          },
+        ],
+      },
+
+      {
+        title: "Categorías",
+        url: "#",
+        icon: BoxIcon,
+        items: [
+          {
+            title: "Gestión de Categorías",
+            url: "/admin/categories-management",
+          },
+        ],
+      },
     ],
 
     [Roles.CAJERO]: [
@@ -38,18 +75,18 @@ export const sideBarData = {
         url: "/caja/mesas",
         icon: Table,
       },
-      // {
-      //   title: "Caja",
-      //   url: "#",
-      //   icon: UserPlus,
-      //   isActive: true,
-      //   items: [
-      //     {
-      //       title: "Llamar lista",
-      //       url: "/attendance/call",
-      //     },
-      //   ],
-      // },
+
+      {
+        title: "Caja",
+        url: "#",
+        icon: BoxIcon,
+        items: [
+          {
+            title: "Apertura-cierre de Caja",
+            url: "/caja/cash-register",
+          },
+        ],
+      },
     ],
 
     [Roles.MOZO]: [

@@ -25,6 +25,9 @@ export const updateProduct = async (id: string, product: any) => {
 };
 
 export const getCategories = async () => {
-  const { data } = await axiosInstance.get<CategoriesI[]>("categories");
+  const { data } = await axiosInstance.get<CategoriesI[]>(
+    "categories/find-todo",
+  );
+
   return data;
 };

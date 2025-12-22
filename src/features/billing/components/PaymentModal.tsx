@@ -18,10 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ComprobanteType, PaymentMethod } from "../types/billing.types";
-import { Loader2, CheckCircle2, Search } from "lucide-react";
+import { Loader2, CheckCircle2 } from "lucide-react";
 import { PDFViewer } from "@react-pdf/renderer";
 import { toast } from "sonner";
-import { searchDNI, searchRUC } from "../services/billing.service";
 import { BoletaPDF } from "./documents/BoletaPDF";
 import { FacturaPDF } from "./documents/FacturaPDF";
 import { TicketConsumoPDF } from "./documents/TicketConsumoPDF";
@@ -33,8 +32,8 @@ interface Props {
   onClose: () => void;
   orderId: string;
   totalAmount: number;
-  itemIds?: string[]; // ✅ Si existe, es pago parcial
-  allItemsPaid?: boolean; // ✅ Indica si todos los items están pagados
+  itemIds?: string[];
+  allItemsPaid?: boolean;
 }
 
 export const PaymentModal = ({
@@ -43,52 +42,47 @@ export const PaymentModal = ({
   orderId,
   totalAmount,
   itemIds,
-  allItemsPaid = false, // ✅ Default false
+  allItemsPaid = false,
 }: Props) => {
   const navigate = useNavigate();
   const [step, setStep] = useState<"PAYMENT" | "PRINT">("PAYMENT");
   const [saleId, setSaleId] = useState<string | null>(null);
+  const [finalAllItemsPaid, setFinalAllItemsPaid] = useState(allItemsPaid);
 
-  // ✅ Detectar si es pago parcial o completo
   const isPartialPayment = itemIds && itemIds.length > 0;
 
-  // Form State
   const [docType, setDocType] = useState<ComprobanteType>(
-    ComprobanteType.TICKET
+    ComprobanteType.TICKET,
   );
+
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
-    PaymentMethod.EFECTIVO
+    PaymentMethod.EFECTIVO,
   );
+
   const [clientDoc, setClientDoc] = useState("");
   const [clientName, setClientName] = useState("");
   const [clientAddress, setClientAddress] = useState("");
 
-  // Estados para el pago
   const [montoPagado, setMontoPagado] = useState<string>("");
   const [vuelto, setVuelto] = useState<number>(0);
-  const [searchingDoc, setSearchingDoc] = useState(false);
+  // const [searchingDoc, setSearchingDoc] = useState(false);
 
-  // ✅ NUEVO: Estados para impresión de ticket
-  // const [showPrinterModal, setShowPrinterModal] = useState(false);
-  // const [printingTicket, setPrintingTicket] = useState(false);
-  // const { printers, loading: loadingPrinters } = usePrinters();
-
-  // Hooks
-  const createSaleMutation = useCreateSale((id) => {
+  const createSaleMutation = useCreateSale((id, orderStatus) => {
     setSaleId(id);
     setStep("PRINT");
+    if (orderStatus) {
+      setFinalAllItemsPaid(orderStatus.allItemsPaid);
+    }
   });
 
   const { data: printData, isLoading: isLoadingPrint } = usePrintData(saleId);
 
-  // Calcular vuelto automáticamente
   useEffect(() => {
     const pago = parseFloat(montoPagado) || 0;
     const cambio = pago - totalAmount;
     setVuelto(cambio > 0 ? cambio : 0);
   }, [montoPagado, totalAmount]);
 
-  // Limpiar form al cambiar tipo de documento
   useEffect(() => {
     if (docType === ComprobanteType.TICKET) {
       setClientDoc("");
@@ -97,40 +91,38 @@ export const PaymentModal = ({
     }
   }, [docType]);
 
-  // ===== BÚSQUEDA DNI/RUC =====
-  const handleSearchDocument = async () => {
-    if (!clientDoc) {
-      toast.error("Ingrese un documento");
-      return;
-    }
+  // const handleSearchDocument = async () => {
+  //   if (!clientDoc) {
+  //     toast.error("Ingrese un documento");
+  //     return;
+  //   }
 
-    setSearchingDoc(true);
+  //   setSearchingDoc(true);
 
-    try {
-      if (docType === ComprobanteType.FACTURA && clientDoc.length === 11) {
-        const response = await searchRUC(clientDoc);
-        if (response.estado) {
-          setClientName(response.resultado.razon_social);
-          setClientAddress(response.resultado.direccion || "");
-          toast.success("RUC encontrado");
-        }
-      } else if (docType === ComprobanteType.BOLETA && clientDoc.length === 8) {
-        const response = await searchDNI(clientDoc);
-        if (response.estado) {
-          setClientName(response.resultado.nombre_completo);
-          toast.success("DNI encontrado");
-        }
-      } else {
-        toast.error("Documento inválido");
-      }
-    } catch (error: any) {
-      toast.error(error.message || "No se encontró el documento");
-    } finally {
-      setSearchingDoc(false);
-    }
-  };
+  //   try {
+  //     if (docType === ComprobanteType.FACTURA && clientDoc.length === 11) {
+  //       const response = await searchRUC(clientDoc);
+  //       if (response.estado) {
+  //         setClientName(response.resultado.razon_social);
+  //         setClientAddress(response.resultado.direccion || "");
+  //         toast.success("RUC encontrado");
+  //       }
+  //     } else if (docType === ComprobanteType.BOLETA && clientDoc.length === 8) {
+  //       const response = await searchDNI(clientDoc);
+  //       if (response.estado) {
+  //         setClientName(response.resultado.nombre_completo);
+  //         toast.success("DNI encontrado");
+  //       }
+  //     } else {
+  //       toast.error("Documento inválido");
+  //     }
+  //   } catch (error: any) {
+  //     toast.error(error.message || "No se encontró el documento");
+  //   } finally {
+  //     setSearchingDoc(false);
+  //   }
+  // };
 
-  // ===== VALIDACIONES Y ENVÍO =====
   const handlePay = () => {
     if (docType === ComprobanteType.FACTURA) {
       if (clientDoc.length !== 11) {
@@ -178,7 +170,6 @@ export const PaymentModal = ({
     createSaleMutation.mutate(payload);
   };
 
-  // ✅ CERRAR: Navega solo si es pago completo
   const handleCloseComplete = () => {
     setStep("PAYMENT");
     setSaleId(null);
@@ -188,83 +179,14 @@ export const PaymentModal = ({
     setMontoPagado("");
     setVuelto(0);
 
-    // ✅ NAVEGACIÓN CONDICIONAL
-    if (!isPartialPayment || allItemsPaid) {
-      // Cerrar modal y navegar inmediatamente
+    if (!isPartialPayment || finalAllItemsPaid) {
       onClose();
-
-      // Navegar ANTES de que React Query intente refetch
       navigate("/caja/mesas", { replace: true });
     } else {
-      // Pago parcial: solo cerrar modal
       onClose();
     }
   };
 
-  // ✅ NUEVO: Función para imprimir ticket en impresora térmica
-  // const handlePrintTicket = async (printerName: string) => {
-  //   if (!printData) {
-  //     toast.error("No hay datos para imprimir");
-  //     return;
-  //   }
-
-  //   setPrintingTicket(true);
-
-  //   try {
-  //     // Preparar datos para enviar al backend
-  //     const ticketData = {
-  //       printer: printerName, // "caja", "cocina", "bebidas"
-  //       company_name: printData.company.businessName || printData.company.name,
-  //       company_ruc: printData.company.ruc,
-  //       company_address: printData.company.address,
-  //       document_type: printData.document.type,
-  //       document_number: printData.document.number,
-  //       date: new Date(printData.document.date).toLocaleDateString("es-PE"),
-  //       table: printData.order?.tableName || printData.metadata?.mesa || "",
-  //       order_number:
-  //         printData.order?.orderNumber || printData.metadata?.orden || "",
-  //       items: printData.items.map((item) => ({
-  //         quantity: item.quantity,
-  //         description: item.description,
-  //         total: item.totalItem,
-  //       })),
-  //       subtotal:
-  //         printData.totals.valorVenta ??
-  //         (typeof printData.totals.subtotal === "number"
-  //           ? printData.totals.subtotal
-  //           : parseFloat(printData.totals.subtotal)),
-  //       igv:
-  //         typeof printData.totals.igv === "number"
-  //           ? printData.totals.igv
-  //           : parseFloat(printData.totals.igv),
-  //       total:
-  //         printData.totals.precioVentaTotal ??
-  //         (typeof printData.totals.total === "number"
-  //           ? printData.totals.total
-  //           : parseFloat(printData.totals.total)),
-  //       payment_method: printData.payment?.method,
-  //       cash_received: printData.payment?.montoPagado,
-  //       change: printData.payment?.vuelto,
-  //     };
-
-  //     // Llamar al endpoint del backend que se conecta con Print Service
-  //     await axiosInstance.post("/billing/print-ticket", ticketData);
-
-  //     toast.success("Ticket enviado a impresora", {
-  //       description: `Imprimiendo en: ${printerName}`,
-  //     });
-
-  //     setShowPrinterModal(false);
-  //   } catch (error: any) {
-  //     toast.error("Error al imprimir", {
-  //       description: error.response?.data?.message || "Error desconocido",
-  //     });
-  //   } finally {
-  //     setPrintingTicket(false);
-  //   }
-  // };
-
-  // ===== RENDERIZADO DE PDF SEGÚN TIPO =====
   const renderPDF = () => {
     if (!printData) {
       return <TicketConsumoPDF data={null as any} />;
@@ -289,7 +211,7 @@ export const PaymentModal = ({
           {step === "PAYMENT" ? (
             <>
               <DialogHeader>
-                <DialogTitle>💰 Cobrar Pedido</DialogTitle>
+                <DialogTitle>Cobrar Pedido</DialogTitle>
                 {isPartialPayment && (
                   <p className="text-sm text-amber-600 font-medium">
                     ⚠️ Pago parcial - La mesa seguirá ocupada
@@ -326,7 +248,7 @@ export const PaymentModal = ({
                       <span className="text-lg">🧾</span>
                       <span className="text-xs">Ticket</span>
                     </Button>
-                    <Button
+                    {/* <Button
                       type="button"
                       variant={
                         docType === ComprobanteType.BOLETA
@@ -338,8 +260,8 @@ export const PaymentModal = ({
                     >
                       <span className="text-lg">📄</span>
                       <span className="text-xs">Boleta</span>
-                    </Button>
-                    <Button
+                    </Button> */}
+                    {/* <Button
                       type="button"
                       variant={
                         docType === ComprobanteType.FACTURA
@@ -351,12 +273,12 @@ export const PaymentModal = ({
                     >
                       <span className="text-lg">📋</span>
                       <span className="text-xs">Factura</span>
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
 
                 {/* 2. DATOS DEL CLIENTE (Solo si no es Ticket) */}
-                {docType !== ComprobanteType.TICKET && (
+                {/* {docType !== ComprobanteType.TICKET && (
                   <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
                     <Label className="text-base font-semibold">
                       Datos del Cliente
@@ -431,7 +353,7 @@ export const PaymentModal = ({
                       </div>
                     )}
                   </div>
-                )}
+                )} */}
 
                 {/* 3. MÉTODO DE PAGO */}
                 <div className="space-y-2">
@@ -525,12 +447,16 @@ export const PaymentModal = ({
               </DialogFooter>
             </>
           ) : (
-            /* PASO 2: VISTA PREVIA E IMPRESIÓN */
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-green-600">
                   <CheckCircle2 /> ¡Venta Exitosa!
                 </DialogTitle>
+                {finalAllItemsPaid && (
+                  <p className="text-sm text-green-600 font-medium">
+                    ✅ Todos los items han sido pagados. Mesa liberada.
+                  </p>
+                )}
               </DialogHeader>
 
               <div className="space-y-4">
@@ -565,11 +491,11 @@ export const PaymentModal = ({
 
               <DialogFooter className="flex-col gap-2 ">
                 <Button
-                  className=" bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-emerald-600 hover:bg-emerald-700"
                   onClick={handleCloseComplete}
                 >
-                  {/* ✅ Texto condicional */}
-                  {!isPartialPayment || allItemsPaid
+                  {/* ✅ TEXTO DINÁMICO BASADO EN EL BACKEND */}
+                  {!isPartialPayment || finalAllItemsPaid
                     ? "Cerrar y Volver al Mapa"
                     : "Continuar con Otros Pagos"}
                 </Button>

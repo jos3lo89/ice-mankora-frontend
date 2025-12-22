@@ -11,10 +11,10 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useCartStore } from "@/stores/useCartStore";
-import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import type { ProductsI } from "../types/product.interface";
+import type { ProductsI, VariantsI } from "../types/product.interface";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   product: ProductsI | null;
@@ -23,16 +23,15 @@ interface Props {
 }
 
 export const ProductModal = ({ product, open, onClose }: Props) => {
-  const addItem = useCartStore((state) => state.addItem);
+  const { addItem } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
-  const [selectedVariants, setSelectedVariants] = useState<any[]>([]);
+  const [selectedVariants, setSelectedVariants] = useState<VariantsI[]>([]);
 
   if (!product) return null;
 
   const handleSave = () => {
     addItem(product, quantity, notes, selectedVariants);
-    toast.success(`${quantity} x ${product.name} agregado`);
     onClose();
     setQuantity(1);
     setNotes("");
@@ -53,7 +52,17 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
         <DialogHeader>
           <DialogTitle>{product.name}</DialogTitle>
           <DialogDescription>
-            S/ {Number(product.price).toFixed(2)}
+            <Badge variant="secondary" className="px-2">
+              S/
+              {(
+                (Number(product.price) +
+                  selectedVariants.reduce(
+                    (a, b) => a + Number(b.priceExtra),
+                    0,
+                  )) *
+                quantity
+              ).toFixed(2)}
+            </Badge>
           </DialogDescription>
         </DialogHeader>
 
@@ -70,7 +79,7 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
                     <Checkbox
                       id={variant.id}
                       checked={selectedVariants.some(
-                        (v) => v.id === variant.id
+                        (v) => v.id === variant.id,
                       )}
                       onCheckedChange={() => toggleVariant(variant)}
                     />
@@ -113,7 +122,12 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
           </div>
 
           <div className="space-y-2">
-            <Label>Notas de Cocina (Opcional)</Label>
+            <Label>
+              Notas de Cocina
+              <Badge variant="outline" className="px-2">
+                Opcional
+              </Badge>
+            </Label>
             <Textarea
               placeholder="Ej: Sin hielo, Poco picante..."
               value={notes}
@@ -123,13 +137,13 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
         </div>
 
         <DialogFooter>
-          <Button onClick={handleSave} className="w-full text-lg h-12">
+          <Button onClick={handleSave} className="w-full cursor-pointer">
             Agregar al Pedido S/
             {(
               (Number(product.price) +
                 selectedVariants.reduce(
                   (a, b) => a + Number(b.priceExtra),
-                  0
+                  0,
                 )) *
               quantity
             ).toFixed(2)}
