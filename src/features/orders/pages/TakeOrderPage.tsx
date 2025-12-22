@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useCatalog } from "../hooks/useCatalog";
+import { useCatalog, useProducts } from "../hooks/useCatalog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -23,30 +23,31 @@ const TakeOrderPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<ProductsI | null>(
-    null
+    null,
   );
   const [openFilter, setOpenFilter] = useState(false);
 
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get("tableId");
-  const tableName = searchParams.get("tableName");
   const tableNumber = searchParams.get("tableNumber");
 
-  const { categoriesQuery, productsQuery } = useCatalog();
+  const { data: categoriesQuery } = useCatalog();
+  const { data: productsQuery, isLoading: productsIsLoading } = useProducts();
+
   const { setTable } = useCartStore();
 
   useEffect(() => {
-    if (tableId && tableName && tableNumber) {
+    if (tableId && tableNumber) {
       setTable({
         id: tableId,
-        name: tableName,
+        name: `Mesa ${tableNumber}`,
         tableNumber: tableNumber,
       });
     }
-  }, [tableId, tableName, tableNumber, setTable]);
+  }, [tableId, tableNumber, setTable]);
 
-  const categories = categoriesQuery.data || [];
-  const products = productsQuery.data || [];
+  const categories = categoriesQuery || [];
+  const products = productsQuery || [];
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
@@ -57,7 +58,7 @@ const TakeOrderPage = () => {
     return matchesCategory && matchesSearch;
   });
 
-  if (productsQuery.isLoading) return <SpinnerLoading />;
+  if (productsIsLoading) return <SpinnerLoading />;
 
   return (
     <div className="relative min-h-[calc(100vh-80px)] pb-20">

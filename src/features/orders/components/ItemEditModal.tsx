@@ -24,7 +24,7 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
   const [quantity, setQuantity] = useState<number>(item.quantity);
   const [notes, setNotes] = useState<string>(item.notes ?? "");
   const [variants, setVariants] = useState<ProductVariant[]>(
-    item.selectedVariants
+    item.selectedVariants,
   );
   const [mounted, setMounted] = useState(false);
 
@@ -44,11 +44,11 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
     };
   }, [open]);
 
-  const toggleVariant = (v: ProductVariant) => {
+  const toggleVariant = (v: any) => {
     setVariants((prev) =>
       prev.some((s) => s.id === v.id)
         ? prev.filter((s) => s.id !== v.id)
-        : [...prev, v]
+        : [...prev, v],
     );
   };
 
@@ -168,6 +168,6 @@ export const ItemEditModal = ({ item, open, onClose }: ItemEditModalProps) => {
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };

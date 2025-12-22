@@ -10,7 +10,6 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 import { useState } from "react";
 import { PreCuentaModal } from "../components/PreCuentaModal";
 
@@ -18,7 +17,7 @@ const TableDetailMozo = () => {
   const { id: tableId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const tableName = searchParams.get("tableName");
+  // const tableName = searchParams.get("tableName");
   const tableNumber = searchParams.get("tableNumber");
   const piso = searchParams.get("piso");
   const [showPreCuentaModal, setShowPreCuentaModal] = useState(false);
@@ -72,7 +71,7 @@ const TableDetailMozo = () => {
 
   const handleAddItems = () => {
     navigate(
-      `/mozo/order/new?tableId=${tableId}&tableName=${tableName}&orderId=${order.id}&tableNumber=${tableNumber}`
+      `/mozo/order/new?tableId=${tableId}&tableName=${tableNumber}&orderId=${order.id}&tableNumber=${tableNumber}`,
     );
   };
 
@@ -107,7 +106,7 @@ const TableDetailMozo = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl font-bold text-foreground">
-                    {tableName}
+                    {`Mesa: ${tableNumber}`}
                   </h1>
                   <Badge
                     variant={getStatusVariant(order.status)}
@@ -135,37 +134,9 @@ const TableDetailMozo = () => {
                 <Plus className="" />
                 Agregar Pedido
               </Button>
-              {/* <Button
-                size="sm"
-                variant="outline"
-                onClick={handlePreAccount}
-                disabled={loadingPreCount}
-                className="flex-1 gap-2"
-              >
-                <Receipt className="" />
-                {loadingPreCount ? "Solicitando..." : "Pre-Cuenta"}
-              </Button> */}
             </div>
           </div>
         </div>
-
-        {/* ✅ NUEVO: Sección de Impresión */}
-        {/* {order && (
-          <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Printer className="w-5 h-5 text-primary" />
-                <h3 className="font-semibold">Opciones de Impresión</h3>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <PrintButtons
-                orderId={order.id}
-                orderNumber={order.dailyNumber}
-              />
-            </CardContent>
-          </Card>
-        )} */}
 
         <Card className="">
           <CardHeader className="">
@@ -229,34 +200,13 @@ const TableDetailMozo = () => {
             </div>
           </CardContent>
 
-          <CardFooter className="flex flex-col p-0 border-t bg-muted/30">
-            <div className="w-full p-4 space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground font-mono">
-                  Subtotal
-                </span>
-                <span className="font-medium font-mono">
-                  S/ {(totalAmount / 1.18).toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground font-mono">
-                  IGV (18%)
-                </span>
-                <span className="font-medium font-mono">
-                  S/ {(totalAmount - totalAmount / 1.18).toFixed(2)}
-                </span>
-              </div>
-              <Separator />
-              <div className="flex justify-between items-center pt-1">
-                <span className="text-lg font-semibold text-foreground font-mono">
-                  Total a Pagar
-                </span>
-                <span className="text-2xl font-bold text-primary font-mono">
-                  S/ {totalAmount.toFixed(2)}
-                </span>
-              </div>
-            </div>
+          <CardFooter className="flex justify-between items-center border-t bg-muted/30">
+            <span className="text-lg font-semibold text-foreground font-mono">
+              Total a Pagar
+            </span>
+            <span className="text-2xl font-bold text-primary font-mono">
+              S/ {totalAmount.toFixed(2)}
+            </span>
           </CardFooter>
         </Card>
       </div>

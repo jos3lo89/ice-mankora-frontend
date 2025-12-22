@@ -24,17 +24,18 @@ const FloorMapPage = () => {
   }, [floors, selectedFloorId]);
 
   const handleTableClick = (table: Table) => {
-    if (!user) return;
+    if (!user) {
+      toast.error("Usuario no autenticado");
+      return;
+    }
 
     const rolePrefix = user.role === "MOZO" ? "/mozo" : "/caja";
 
     if (table.status === "LIBRE") {
       navigate(
-        `${rolePrefix}/order/new?tableId=${
-          table.id
-        }&tableName=${encodeURIComponent(table.name)}&tableNumber=${
+        `${rolePrefix}/order/new?tableId=${table.id}&tableNumber=${
           table.number
-        }`
+        }`,
       );
       return;
     }
@@ -42,42 +43,29 @@ const FloorMapPage = () => {
     if (table.status === "OCUPADA") {
       if (rolePrefix === "/mozo") {
         navigate(
-          `${rolePrefix}/table/${table.id}/detail?tableName=${
-            table.name
-          }&tableNumber=${table.number}&piso=${
+          `${rolePrefix}/table/${table.id}/detail?tableNumber=${table.number}&piso=${
             floors?.find((floor) => floor.id === selectedFloorId)?.name
-          }`
+          }`,
         );
         return;
       }
       navigate(
         `${rolePrefix}/table/${table.id}/details?tableName=${
-          table.name
+          table.id
         }&tableNumber=${table.number}&piso=${
           floors?.find((floor) => floor.id === selectedFloorId)?.name
-        }`
+        }`,
       );
 
       return;
     }
 
-    // --- CASO 3: PIDIENDO CUENTA (AMARILLA) ---
     if (table.status === "PIDIENDO_CUENTA") {
       if (user.role === "MOZO") {
         toast.info(
-          `La Mesa ${table.number} está esperando el cobro. Avisa a Caja.`
+          `La Mesa ${table.number} está esperando el cobro. Avisa a Caja.`,
         );
       } else {
-        // ROL: CAJERO o ADMIN -> Acción: COBRAR
-        // Opción A: Redirigir a la pantalla de detalles/facturación
-        // navigate(`${rolePrefix}/table/${table.id}/details?action=pay`);
-
-        // Opción B (Más rápida): Abrir Modal de Pago aquí mismo si tenemos el orderId
-        // NOTA: Como la tabla 'table' del endpoint /floors a veces no trae el orderId,
-        // lo ideal es ir a la página de detalles que carga la orden.
-        // Pero si tu backend manda el activeOrderId en la mesa, úsalo aquí:
-
-        // toast.success("Abriendo caja para cobrar...");
         navigate(`${rolePrefix}/table/${table.id}/details?action=pay`);
       }
       return;
@@ -86,17 +74,14 @@ const FloorMapPage = () => {
 
   if (isLoading) return <SpinnerLoading />;
 
-  if (isError)
+  if (isError) {
     return <div className="text-red-500 text-center">Error cargando pisos</div>;
+  }
 
   return (
     <div className="space-y-6">
       {floors && (
-        <Tabs
-          value={selectedFloorId}
-          onValueChange={setSelectedFloorId}
-          className="w-full"
-        >
+        <Tabs value={selectedFloorId} onValueChange={setSelectedFloorId}>
           <FloorSelector floors={floors} />
 
           {floors.map((floor) => (

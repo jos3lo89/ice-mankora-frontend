@@ -22,14 +22,14 @@ export const InlineCartEditor = ({
   const [quantity, setQuantity] = useState(item.quantity);
   const [notes, setNotes] = useState(item.notes || "");
   const [variants, setVariants] = useState<ProductVariant[]>(
-    item.selectedVariants || []
+    item.selectedVariants || [],
   );
 
-  const toggleVariant = (v: ProductVariant) => {
+  const toggleVariant = (v: any) => {
     setVariants((prev) =>
       prev.some((s) => s.id === v.id)
         ? prev.filter((s) => s.id !== v.id)
-        : [...prev, v]
+        : [...prev, v],
     );
   };
 

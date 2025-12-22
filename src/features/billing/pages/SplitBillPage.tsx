@@ -33,18 +33,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import {
-  Plus,
-  GripVertical,
-  MoreVertical,
-  Info,
-  CheckCircle2,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Plus, GripVertical, Info, CheckCircle2 } from "lucide-react";
+
 import { PaymentModal } from "../components/PaymentModal";
 import SpinnerLoading from "@/components/SpinnerLoading";
 import { toast } from "sonner";
@@ -72,13 +62,13 @@ function SortableItem({
     isDragging,
   } = useSortable({
     id,
-    disabled: isPaid, // ✅ Deshabilitar drag si ya está pagado
+    disabled: isPaid,
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : isPaid ? 0.6 : 1, // ✅ Opacidad reducida si está pagado
+    opacity: isDragging ? 0.5 : isPaid ? 0.6 : 1,
   };
 
   const hasDetails = item.notes || item.variantsDetail;
@@ -91,7 +81,6 @@ function SortableItem({
         isPaid ? "bg-green-50 border-green-300" : ""
       }`}
     >
-      {/* ✅ Indicador de pagado */}
       {isPaid && (
         <div className="absolute top-1 right-1">
           <CheckCircle2 className="w-4 h-4 text-green-600" />
@@ -121,7 +110,7 @@ function SortableItem({
               {item.quantity}
             </Badge>
             <p
-              className={`font-medium text-sm truncate leading-tight ${
+              className={`font-medium text-sm  leading-tight ${
                 isPaid ? "line-through text-muted-foreground" : ""
               }`}
             >
@@ -225,30 +214,25 @@ export default function SplitBillPage() {
     itemIds: string[];
   } | null>(null);
 
-  // ✅ Actualizar columnas cuando cambie la orden (después de pagar)
   useEffect(() => {
     if (!order) return;
 
-    // Separar items pagados de no pagados
     const unpaidItems = order.items.filter((item) => !item.saleId);
     const paidItems = order.items.filter((item) => item.saleId);
 
     setColumns((prev) => {
       if (Object.keys(prev).length > 0) {
-        // Si ya hay columnas, actualizar solo los items no pagados
         const updatedColumns = { ...prev };
 
-        // Remover items pagados de todas las columnas
         Object.keys(updatedColumns).forEach((key) => {
           updatedColumns[key] = updatedColumns[key].filter(
-            (item) => !paidItems.find((paid) => paid.id === item.id)
+            (item) => !paidItems.find((paid) => paid.id === item.id),
           );
         });
 
         return updatedColumns;
       }
 
-      // Primera vez: todos los items no pagados en cuenta principal
       return { "cuenta-principal": unpaidItems };
     });
 
@@ -260,13 +244,13 @@ export default function SplitBillPage() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor)
+    useSensor(KeyboardSensor),
   );
 
   const findContainer = (id: string) => {
     if (id in columns) return id;
     return Object.keys(columns).find((key) =>
-      columns[key].find((i: any) => i.id === id)
+      columns[key].find((i: any) => i.id === id),
     );
   };
 
@@ -336,10 +320,10 @@ export default function SplitBillPage() {
 
     if (activeContainer && overContainer && activeContainer === overContainer) {
       const activeIndex = columns[activeContainer].findIndex(
-        (i) => i.id === active.id
+        (i) => i.id === active.id,
       );
       const overIndex = columns[overContainer].findIndex(
-        (i) => i.id === over?.id
+        (i) => i.id === over?.id,
       );
 
       if (activeIndex !== overIndex) {
@@ -348,7 +332,7 @@ export default function SplitBillPage() {
           [activeContainer]: arrayMove(
             prev[activeContainer],
             activeIndex,
-            overIndex
+            overIndex,
           ),
         }));
       }
@@ -366,7 +350,6 @@ export default function SplitBillPage() {
   const handlePayGroup = (columnId: string) => {
     const items = columns[columnId];
 
-    // ✅ Filtrar solo items no pagados
     const unpaidItems = items.filter((item) => !item.saleId);
 
     if (unpaidItems.length === 0) {
@@ -376,7 +359,7 @@ export default function SplitBillPage() {
 
     const total = unpaidItems.reduce(
       (acc: number, item: any) => acc + Number(item.price) * item.quantity,
-      0
+      0,
     );
     const itemIds = unpaidItems.map((i: any) => i.id);
     setActivePaymentGroup({ id: columnId, total, itemIds });
@@ -386,7 +369,6 @@ export default function SplitBillPage() {
   const handleClosePayment = () => {
     setPaymentOpen(false);
     setActivePaymentGroup(null);
-    // ✅ Refrescar la orden para ver items pagados
     refetch();
   };
 
@@ -402,7 +384,6 @@ export default function SplitBillPage() {
 
   if (isLoading) return <SpinnerLoading />;
 
-  // ✅ Verificar si todos los items están pagados
   const allItemsPaid = order?.items.every((item) => item.saleId !== null);
 
   return (
@@ -447,11 +428,11 @@ export default function SplitBillPage() {
                 const total = unpaidItems.reduce(
                   (acc: number, item: any) =>
                     acc + Number(item.price) * item.quantity,
-                  0
+                  0,
                 );
 
-                const Subtotal = (total / 1.18).toFixed(2);
-                const totalIgv = (total - total / 1.18).toFixed(2);
+                // const Subtotal = (total / 1.18).toFixed(2);
+                // const totalIgv = (total - total / 1.18).toFixed(2);
 
                 const paidCount = items.filter((item) => item.saleId).length;
                 const allPaidInColumn =
@@ -476,20 +457,20 @@ export default function SplitBillPage() {
                           </Badge>
                         )}
                       </CardTitle>
-                      <DropdownMenu>
+                      {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
                             <MoreVertical size={16} />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          {/* <DropdownMenuItem
+                          <DropdownMenuItem
                             onClick={() => toast.info("Pre-cuenta parcial...")}
                           >
                             <Printer className="mr-2 h-4 w-4" /> Pre-cuenta
-                          </DropdownMenuItem> */}
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                      </DropdownMenu> */}
                     </CardHeader>
 
                     <div className="flex justify-between items-center px-6 text-xs text-muted-foreground font-medium shrink-0">
@@ -525,8 +506,8 @@ export default function SplitBillPage() {
                       </DroppableContainer>
                     </SortableContext>
 
-                    <CardFooter className="pt-4 border-t flex-col gap-3 pb-6 shrink-0">
-                      <div className="w-full space-y-2">
+                    <CardFooter className="pt-4 border-t flex-col gap-3 shrink-0">
+                      {/* <div className="w-full space-y-2">
                         <div className="flex justify-between items-center text-sm font-mono">
                           <span>Sub Total</span>
                           <span>S/ {Subtotal}</span>
@@ -536,7 +517,7 @@ export default function SplitBillPage() {
                           <span>IGV (18%)</span>
                           <span>S/ {totalIgv}</span>
                         </div>
-                      </div>
+                      </div> */}
 
                       <Button
                         className="w-full cursor-pointer"
