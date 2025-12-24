@@ -52,16 +52,18 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
         <DialogHeader>
           <DialogTitle>{product.name}</DialogTitle>
           <DialogDescription>
-            <Badge variant="secondary" className="px-2">
-              S/
-              {(
-                (Number(product.price) +
-                  selectedVariants.reduce(
-                    (a, b) => a + Number(b.priceExtra),
-                    0,
-                  )) *
-                quantity
-              ).toFixed(2)}
+            <Badge variant="outline" className="px-2 text-lg">
+              <span>
+                S/{" "}
+                {(
+                  (Number(product.price) +
+                    selectedVariants.reduce(
+                      (a, b) => a + Number(b.priceExtra),
+                      0
+                    )) *
+                  quantity
+                ).toFixed(2)}
+              </span>
             </Badge>
           </DialogDescription>
         </DialogHeader>
@@ -79,7 +81,7 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
                     <Checkbox
                       id={variant.id}
                       checked={selectedVariants.some(
-                        (v) => v.id === variant.id,
+                        (v) => v.id === variant.id
                       )}
                       onCheckedChange={() => toggleVariant(variant)}
                     />
@@ -97,22 +99,22 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
             </div>
           )}
 
-          <div className="flex items-center justify-center gap-6 py-4">
+          <div className="flex items-center justify-center gap-2">
             <Button
               variant="outline"
               size="icon"
-              className="h-12 w-12"
+              className="h-10 w-10 cursor-pointer"
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
             >
               <Minus />
             </Button>
-            <span className="text-4xl font-bold w-12 text-center">
+            <span className="text-4xl font-bold w-10 text-center">
               {quantity}
             </span>
             <Button
               variant="outline"
               size="icon"
-              className="h-12 w-12"
+              className="h-10 w-10 cursor-pointer"
               onClick={() =>
                 setQuantity(Math.min(product.stockDaily, quantity + 1))
               }
@@ -137,16 +139,8 @@ export const ProductModal = ({ product, open, onClose }: Props) => {
         </div>
 
         <DialogFooter>
-          <Button onClick={handleSave} className="w-full cursor-pointer">
-            Agregar al Pedido S/
-            {(
-              (Number(product.price) +
-                selectedVariants.reduce(
-                  (a, b) => a + Number(b.priceExtra),
-                  0,
-                )) *
-              quantity
-            ).toFixed(2)}
+          <Button onClick={handleSave} className="cursor-pointer w-full">
+            Agregar al Pedido
           </Button>
         </DialogFooter>
       </DialogContent>

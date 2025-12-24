@@ -8,7 +8,7 @@ interface Props {
 
 const TableItem = ({ table, onClick }: Props) => {
   const statusColor = {
-    [TableStatus.LIBRE]: "bg-green-500 hover:bg-green-600 text-white",
+    [TableStatus.LIBRE]: "bg-primary hover:bg-green-600 text-white",
     [TableStatus.OCUPADA]: "bg-red-500 hover:bg-red-600 text-white",
     [TableStatus.PIDIENDO_CUENTA]:
       "bg-yellow-400 hover:bg-yellow-500 text-black",

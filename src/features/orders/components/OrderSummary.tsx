@@ -150,7 +150,7 @@ export const OrderSummary = () => {
             </div>
 
             <Button
-              className="w-full text-lg cursor-pointer rounded-xl bg-green-600 hover:bg-green-700 h-12"
+              className="w-full text-lg cursor-pointer rounded-xl bg-green-700 hover:bg-green-800 h-12"
               onClick={handleSend}
               disabled={isPending || isPendingItems}
             >

@@ -10,6 +10,7 @@ import { Roles } from "@/enums/roles.enum";
 import {
   CashRegisterDetailsPage,
   CashRegisterPage,
+  CashRegisterPDFView,
   CategoriesManagementPage,
   DashboardAdminPage,
   DashboardCajaPage,
@@ -108,6 +109,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <CashRegisterDetailsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/admin/cash-register/:id/pdf",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <CashRegisterPDFView />
           </Suspense>
         ),
       },
@@ -227,6 +236,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<Loading />}>
             <CashRegisterDetailsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/caja/cash-register/:id/pdf",
+        element: (
+          <Suspense fallback={<Loading />}>
+            <CashRegisterPDFView />
           </Suspense>
         ),
       },

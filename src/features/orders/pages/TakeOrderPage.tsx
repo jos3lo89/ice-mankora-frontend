@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useCatalog, useProducts } from "../hooks/useCatalog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { RefreshCcw, Search } from "lucide-react";
 import { ProductCard } from "../components/ProductCard";
 import { ProductModal } from "../components/ProductModal";
 import { useCartStore } from "@/stores/useCartStore";
@@ -18,12 +17,13 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import type { ProductsI } from "../types/product.interface";
+import { useRefreshQuery } from "@/utils/queryUtils";
 
 const TakeOrderPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<ProductsI | null>(
-    null,
+    null
   );
   const [openFilter, setOpenFilter] = useState(false);
 
@@ -33,8 +33,8 @@ const TakeOrderPage = () => {
 
   const { data: categoriesQuery } = useCatalog();
   const { data: productsQuery, isLoading: productsIsLoading } = useProducts();
-
   const { setTable } = useCartStore();
+  const { refreshMultipleQueries, isRefreshing } = useRefreshQuery();
 
   useEffect(() => {
     if (tableId && tableNumber) {
@@ -72,62 +72,34 @@ const TakeOrderPage = () => {
         />
       </div>
 
-      <div className="hidden lg:block">
-        <Tabs
-          defaultValue="ALL"
-          value={selectedCategory}
-          onValueChange={setSelectedCategory}
-          className="w-full"
+      <div className="flex justify-center items-center mb-4 gap-3">
+        <Button
+          onClick={() => setSelectedCategory("ALL")}
+          className="cursor-pointer"
+          variant="outline"
         >
-          <TabsList className="w-full flex gap-2 overflow-x-auto h-auto p-1 bg-transparent">
-            <TabsTrigger
-              value="ALL"
-              className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-full border px-4 py-2"
-            >
-              Todos
-            </TabsTrigger>
-
-            {categories.map((cat) => (
-              <TabsTrigger
-                key={cat.id}
-                value={cat.id}
-                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-full border px-4 py-2 whitespace-nowrap"
-              >
-                {cat.name}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-      </div>
-
-      <div className="lg:hidden flex justify-between items-center mb-4">
-        <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-          <TabsList className="flex gap-2 bg-transparent">
-            <TabsTrigger
-              value="ALL"
-              className="rounded-full border px-4 py-2 data-[state=active]:bg-primary data-[state=active]:text-white"
-            >
-              Todos
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+          Todos
+        </Button>
 
         <Sheet open={openFilter} onOpenChange={setOpenFilter}>
-          <SheetTrigger className="px-4 py-2 bg-primary text-white rounded-full">
-            Filtrar
+          <SheetTrigger asChild>
+            <Button variant="secondary" className="cursor-pointer">
+              Filtrar
+            </Button>
           </SheetTrigger>
 
-          <SheetContent side="bottom" className="h-[60%] p-4">
+          <SheetContent side="bottom" className="p-4">
             <SheetHeader>
               <SheetTitle>Categorías</SheetTitle>
               <SheetDescription></SheetDescription>
             </SheetHeader>
 
-            <div className="grid grid-cols-2 gap-3 overflow-y-auto mt-4 max-h-[300px] pr-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {categories.map((cat) => (
                 <Button
                   key={cat.id}
-                  className="rounded-lg  py-3 text-center transition-all"
+                  variant="secondary"
+                  className="rounded-lg  py-3 text-center transition-all "
                   onClick={() => {
                     setSelectedCategory(cat.id);
                     setOpenFilter(false);
@@ -139,9 +111,18 @@ const TakeOrderPage = () => {
             </div>
           </SheetContent>
         </Sheet>
+
+        <Button
+          onClick={() => refreshMultipleQueries([["categories"], ["products"]])}
+          className="cursor-pointer"
+          variant="outline"
+          disabled={isRefreshing}
+        >
+          <RefreshCcw className={isRefreshing ? "animate-spin" : ""} />
+        </Button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 mt-2">
         {filteredProducts.map((product) => (
           <ProductCard
             key={product.id}

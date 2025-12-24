@@ -49,7 +49,7 @@ export const CloseCashRegisterModal = ({
           onClose();
           setFinalMoney("");
         },
-      },
+      }
     );
   };
 
@@ -68,30 +68,27 @@ export const CloseCashRegisterModal = ({
             </div>
           ) : (
             <>
-              <div className="p-4  rounded-lg border-2">
-                <p className="text-sm font-medium text-blue-700 mb-2">
-                  Cálculo del Sistema:
-                </p>
-                <div className="space-y-1 text-sm">
+              <div className="p-4  rounded-lg border-2 bg-muted-foreground/10">
+                <div className="space-y-1 text-sm font-mono">
                   <div className="flex justify-between">
                     <span>Inicial:</span>
                     <span className="font-mono">
                       S/ {summary?.breakdown.inicial.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-green-700">
+                  <div className="flex justify-between text-green-500">
                     <span>+ Ventas:</span>
                     <span className="font-mono">
                       S/ {summary?.breakdown.ventas.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-blue-700">
+                  <div className="flex justify-between text-blue-500">
                     <span>+ Ingresos Extra:</span>
                     <span className="font-mono">
                       S/ {summary?.breakdown.ingresosExtra.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-red-700">
+                  <div className="flex justify-between text-red-400">
                     <span>- Egresos:</span>
                     <span className="font-mono">
                       S/ {summary?.breakdown.egresos.toFixed(2)}
@@ -111,7 +108,7 @@ export const CloseCashRegisterModal = ({
                 <p className="text-sm text-muted-foreground">
                   Monto Esperado por el Sistema
                 </p>
-                <p className="text-3xl font-bold">
+                <p className="text-2xl font-mono">
                   S/ {systemMoney.toFixed(2)}
                 </p>
               </div>
@@ -141,8 +138,8 @@ export const CloseCashRegisterModal = ({
                   difference === 0
                     ? " border border-green-200"
                     : difference > 0
-                      ? "border border-blue-200"
-                      : "border border-red-200"
+                    ? "border border-blue-200"
+                    : "border border-red-200"
                 }`}
               >
                 <p className="text-sm font-medium mb-2">
@@ -176,22 +173,22 @@ export const CloseCashRegisterModal = ({
                       difference === 0
                         ? "bg-green-500"
                         : difference > 0
-                          ? "bg-blue-500"
-                          : "bg-red-500"
+                        ? "bg-blue-500"
+                        : "bg-red-500"
                     }
                   >
                     {difference === 0
                       ? "✓ EXACTO"
                       : difference > 0
-                        ? "↑ SOBRANTE"
-                        : "↓ FALTANTE"}
+                      ? "↑ SOBRANTE"
+                      : "↓ FALTANTE"}
                   </Badge>
                   <p className="text-xs text-muted-foreground">
                     {difference === 0
                       ? "Cuadra perfectamente"
                       : difference > 0
-                        ? "Hay más dinero del esperado"
-                        : "Falta dinero en caja"}
+                      ? "Hay más dinero del esperado"
+                      : "Falta dinero en caja"}
                   </p>
                 </div>
               </div>
