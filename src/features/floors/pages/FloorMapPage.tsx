@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import SpinnerLoading from "@/components/SpinnerLoading";
 import FloorSelector from "../components/FloorSelector";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
+import { useRefreshQuery } from "@/utils/queryUtils";
 
 const FloorMapPage = () => {
   const { data: floors, isLoading, isError } = useFloors();
@@ -16,6 +19,7 @@ const FloorMapPage = () => {
 
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { refreshQuery, isRefreshing } = useRefreshQuery();
 
   useEffect(() => {
     if (floors && floors.length > 0 && !selectedFloorId) {
@@ -33,9 +37,7 @@ const FloorMapPage = () => {
 
     if (table.status === "LIBRE") {
       navigate(
-        `${rolePrefix}/order/new?tableId=${table.id}&tableNumber=${
-          table.number
-        }`,
+        `${rolePrefix}/order/new?tableId=${table.id}&tableNumber=${table.number}`
       );
       return;
     }
@@ -43,9 +45,9 @@ const FloorMapPage = () => {
     if (table.status === "OCUPADA") {
       if (rolePrefix === "/mozo") {
         navigate(
-          `${rolePrefix}/table/${table.id}/detail?tableNumber=${table.number}&piso=${
-            floors?.find((floor) => floor.id === selectedFloorId)?.name
-          }`,
+          `${rolePrefix}/table/${table.id}/detail?tableNumber=${
+            table.number
+          }&piso=${floors?.find((floor) => floor.id === selectedFloorId)?.name}`
         );
         return;
       }
@@ -54,7 +56,7 @@ const FloorMapPage = () => {
           table.id
         }&tableNumber=${table.number}&piso=${
           floors?.find((floor) => floor.id === selectedFloorId)?.name
-        }`,
+        }`
       );
 
       return;
@@ -63,7 +65,7 @@ const FloorMapPage = () => {
     if (table.status === "PIDIENDO_CUENTA") {
       if (user.role === "MOZO") {
         toast.info(
-          `La Mesa ${table.number} está esperando el cobro. Avisa a Caja.`,
+          `La Mesa ${table.number} está esperando el cobro. Avisa a Caja.`
         );
       } else {
         navigate(`${rolePrefix}/table/${table.id}/details?action=pay`);
@@ -82,7 +84,17 @@ const FloorMapPage = () => {
     <div className="space-y-6">
       {floors && (
         <Tabs value={selectedFloorId} onValueChange={setSelectedFloorId}>
-          <FloorSelector floors={floors} />
+          <div className="flex justify-center items-center gap-2 ">
+            <FloorSelector floors={floors} />
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => refreshQuery("floors")}
+              disabled={isRefreshing}
+            >
+              <RefreshCcw className={isRefreshing ? "animate-spin" : ""} />
+            </Button>
+          </div>
 
           {floors.map((floor) => (
             <TabsContent key={floor.id} value={floor.id}>

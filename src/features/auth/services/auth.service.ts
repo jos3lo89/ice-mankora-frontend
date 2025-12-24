@@ -1,12 +1,8 @@
 import axiosInstance from "@/lib/axios";
 import { type SignInSchema } from "../schemas/auth.schema";
-import type { LoginResponse } from "../interface/signin.interface";
+import type { SigninI } from "../interface/signin.interface";
 
-export const login = async (data: SignInSchema): Promise<LoginResponse> => {
-  const response = await axiosInstance.post<LoginResponse>(
-    "/auth/signin",
-    data
-  );
-
-  return response.data;
+export const login = async (userData: SignInSchema): Promise<SigninI> => {
+  const { data } = await axiosInstance.post<SigninI>("/auth/signin", userData);
+  return data;
 };

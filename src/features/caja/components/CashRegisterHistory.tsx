@@ -19,7 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Eye, X } from "lucide-react";
+import { CalendarIcon, Eye, FileText, X } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -38,12 +38,12 @@ export const CashRegisterHistory = () => {
       if (dateRange?.from && dateRange?.to) {
         const days = Math.ceil(
           (dateRange.to.getTime() - dateRange.from.getTime()) /
-            (1000 * 60 * 60 * 24),
+            (1000 * 60 * 60 * 24)
         );
         return cashRegisterApi.getHistory(
           days,
           dateRange.from.toISOString(),
-          dateRange.to.toISOString(),
+          dateRange.to.toISOString()
         );
       }
       return cashRegisterApi.getHistory(30);
@@ -114,7 +114,7 @@ export const CashRegisterHistory = () => {
                 variant="outline"
                 className={cn(
                   "justify-start text-left font-normal",
-                  !dateRange?.from && !dateRange?.to && "text-muted-foreground",
+                  !dateRange?.from && !dateRange?.to && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -170,7 +170,10 @@ export const CashRegisterHistory = () => {
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">
                 {dateRange?.from && dateRange?.to
-                  ? `Del ${format(dateRange.from, "dd/MM/yyyy")} al ${format(dateRange.to, "dd/MM/yyyy")}`
+                  ? `Del ${format(dateRange.from, "dd/MM/yyyy")} al ${format(
+                      dateRange.to,
+                      "dd/MM/yyyy"
+                    )}`
                   : "Últimos 30 días"}
               </h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -236,12 +239,16 @@ export const CashRegisterHistory = () => {
                         </td>
                         <td className="p-2 text-right">
                           {cr.systemMoney
-                            ? `S/ ${parseFloat(cr.systemMoney.toString()).toFixed(2)}`
+                            ? `S/ ${parseFloat(
+                                cr.systemMoney.toString()
+                              ).toFixed(2)}`
                             : "-"}
                         </td>
                         <td className="p-2 text-right">
                           {cr.finalMoney
-                            ? `S/ ${parseFloat(cr.finalMoney.toString()).toFixed(2)}`
+                            ? `S/ ${parseFloat(
+                                cr.finalMoney.toString()
+                              ).toFixed(2)}`
                             : "-"}
                         </td>
                         <td className="p-2 text-center">
@@ -251,13 +258,13 @@ export const CashRegisterHistory = () => {
                                 parseFloat(cr.difference.toString()) === 0
                                   ? "text-green-600 font-semibold"
                                   : parseFloat(cr.difference.toString()) > 0
-                                    ? "text-blue-600 font-semibold"
-                                    : "text-red-600 font-semibold"
+                                  ? "text-blue-600 font-semibold"
+                                  : "text-red-600 font-semibold"
                               }
                             >
                               S/{" "}
                               {Math.abs(
-                                parseFloat(cr.difference.toString()),
+                                parseFloat(cr.difference.toString())
                               ).toFixed(2)}
                             </span>
                           )}
@@ -278,6 +285,19 @@ export const CashRegisterHistory = () => {
                             onClick={() => goToDetails(cr.id)}
                           >
                             <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (!user) return;
+                              const route =
+                                user.role === "CAJERO" ? "caja" : "admin";
+                              navigate(`/${route}/cash-register/${cr.id}/pdf`);
+                            }}
+                            title="Ver PDF"
+                          >
+                            <FileText className="h-4 w-4" />
                           </Button>
                         </td>
                       </tr>

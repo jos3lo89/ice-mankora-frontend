@@ -1,4 +1,5 @@
 import axiosInstance from "@/lib/axios";
+import type { CashRegisterDetailsPdf } from "../types/caja.types";
 
 export interface CashRegisterDetails {
   cashRegister: {
@@ -39,11 +40,14 @@ export interface CashRegisterDetails {
     ventasAutomaticas: Array<any>;
     ingresosExtras: Array<any>;
     egresos: Array<any>;
+    cancelaciones: Array<any>;
   };
   estadisticas: {
     ventaPromedio: number;
     ventaMasAlta: number;
     ventaMasBaja: number;
+    totalCancelaciones: number;
+    montoCancelado: number;
   };
 }
 
@@ -126,29 +130,29 @@ export const cashRegisterApi = {
       amount: number;
       type: "INGRESO" | "EGRESO";
       description: string;
-    },
+    }
   ) => {
     const { data } = await axiosInstance.post(
       `/cash-register/${id}/movements`,
-      movement,
+      movement
     );
     return data;
   },
 
   addManualMovement: async (
     cashRegisterId: string,
-    data: CreateManualMovementDto,
+    data: CreateManualMovementDto
   ) => {
     const response = await axiosInstance.post(
       `/cash-register/${cashRegisterId}/manual-movement`,
-      data,
+      data
     );
     return response.data;
   },
 
   getManualMovements: async (cashRegisterId: string) => {
     const { data } = await axiosInstance.get(
-      `/cash-register/${cashRegisterId}/manual-movements`,
+      `/cash-register/${cashRegisterId}/manual-movements`
     );
     return data;
   },
@@ -156,7 +160,7 @@ export const cashRegisterApi = {
   getHistory: async (
     days: number = 30,
     startDate?: string,
-    endDate?: string,
+    endDate?: string
   ) => {
     const params = new URLSearchParams();
     params.append("days", days.toString());
@@ -164,15 +168,20 @@ export const cashRegisterApi = {
     if (endDate) params.append("endDate", endDate);
 
     const { data } = await axiosInstance.get<CashRegisterHistory[]>(
-      `/cash-register/history?${params.toString()}`,
+      `/cash-register/history?${params.toString()}`
     );
     return data;
   },
 
   getDetails: async (cashRegisterId: string): Promise<CashRegisterDetails> => {
     const { data } = await axiosInstance.get<CashRegisterDetails>(
-      `/cash-register/${cashRegisterId}/details`,
+      `/cash-register/${cashRegisterId}/details`
     );
+    return data;
+  },
+
+  getDetailsPdf: async (id: string): Promise<CashRegisterDetailsPdf> => {
+    const { data } = await axiosInstance.get(`/cash-register/${id}/details`);
     return data;
   },
 };

@@ -7,7 +7,7 @@ interface Props {
 
 const FloorSelector = ({ floors }: Props) => {
   return (
-    <TabsList className="flex gap-2 p-6 rounded-xl mx-auto">
+    <TabsList className="flex gap-2 p-6 rounded-xl">
       {floors.map((floor) => (
         <TabsTrigger
           key={floor.id}

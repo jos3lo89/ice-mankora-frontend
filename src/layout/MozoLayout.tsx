@@ -4,7 +4,6 @@ import {
   Menu,
   Map,
   LogOut,
-  ClipboardList,
   UtensilsCrossed,
   Sun,
   Moon,
@@ -59,10 +58,9 @@ const MozoLayout = () => {
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="-ml-2">
               <Menu className="h-6 w-6" />
-              <span className="sr-only">Abrir menú</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+          <SheetContent side="left">
             <SheetHeader>
               <SheetTitle className="text-left text-xl font-bold">
                 Menú
@@ -70,24 +68,14 @@ const MozoLayout = () => {
               <SheetDescription></SheetDescription>
             </SheetHeader>
 
-            <nav className="flex flex-col gap-4 mt-8">
+            <nav className="flex flex-col gap-2 px-4">
               <SheetClose asChild>
                 <Link
                   to="/mozo/map"
-                  className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-accent rounded-md transition-colors"
+                  className="flex items-center gap-3 px-2 py-2 text-lg font-normal hover:bg-secondary rounded-md transition-colors"
                 >
                   <Map className="h-5 w-5" />
                   Mapa de Mesas
-                </Link>
-              </SheetClose>
-
-              <SheetClose asChild>
-                <Link
-                  to="/mozo/orders"
-                  className="flex items-center gap-3 px-2 py-2 text-lg font-medium hover:bg-accent rounded-md transition-colors"
-                >
-                  <ClipboardList className="h-5 w-5" />
-                  Mis Pedidos
                 </Link>
               </SheetClose>
             </nav>
@@ -104,7 +92,11 @@ const MozoLayout = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full cursor-pointer"
+              >
                 <Avatar className="h-8 w-8 border">
                   <AvatarImage src="" alt={user?.name} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
@@ -121,7 +113,7 @@ const MozoLayout = () => {
                     {user?.name}
                   </p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    Mozo / Personal
+                    Mesero / Personal
                   </p>
                 </div>
               </DropdownMenuLabel>

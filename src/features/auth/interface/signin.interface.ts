@@ -1,6 +1,6 @@
 import type { Roles } from "@/enums/roles.enum";
 
-export interface LoginResponse {
+export interface SigninI {
   id: string;
   name: string;
   dni: string;

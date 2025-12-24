@@ -10,10 +10,16 @@ import {
   User,
   ShoppingCart,
   AlertCircle,
+  ChevronDown,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { cashRegisterApi } from "../services/caja.service";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const CashRegisterDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -164,8 +170,8 @@ const CashRegisterDetailsPage = () => {
                 totales.diferencia === 0
                   ? "text-green-600"
                   : totales.diferencia > 0
-                    ? "text-blue-600"
-                    : "text-red-600"
+                  ? "text-blue-600"
+                  : "text-red-600"
               }`}
             >
               Dif: S/ {Math.abs(totales.diferencia).toFixed(2)}
@@ -187,20 +193,23 @@ const CashRegisterDetailsPage = () => {
                   {data.count} {data.count === 1 ? "venta" : "ventas"}
                 </p>
               </div>
-            ),
+            )
           )}
         </div>
       </Card>
 
       {/* Tabs de Detalles */}
       <Tabs defaultValue="ventas" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="ventas">Ventas ({ventas.total})</TabsTrigger>
           <TabsTrigger value="ingresos">
             Ingresos Extra ({movimientos.ingresosExtras.length})
           </TabsTrigger>
           <TabsTrigger value="egresos">
             Egresos ({movimientos.egresos.length})
+          </TabsTrigger>
+          <TabsTrigger value="cancelaciones">
+            Cancelaciones ({movimientos.cancelaciones.length})
           </TabsTrigger>
           <TabsTrigger value="todos">Todos los Movimientos</TabsTrigger>
         </TabsList>
@@ -375,7 +384,172 @@ const CashRegisterDetailsPage = () => {
           </Card>
         </TabsContent>
 
-        {/* Tab Todos */}
+        <TabsContent value="cancelaciones" className="mt-4">
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Pedidos Cancelados</h3>
+              <Badge variant="destructive">
+                {movimientos.cancelaciones.length} cancelaciones
+              </Badge>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">Hora</th>
+                    <th className="text-left p-2">Pedido</th>
+                    <th className="text-left p-2">Mesa</th>
+                    <th className="text-left p-2">Motivo</th>
+                    <th className="text-left p-2">Autorizado por</th>
+                    <th className="text-right p-2">Total Perdido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {movimientos.cancelaciones.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="text-center p-8 text-muted-foreground"
+                      >
+                        No hay pedidos cancelados en este turno
+                      </td>
+                    </tr>
+                  ) : (
+                    movimientos.cancelaciones.map((c) => (
+                      <tr key={c.id} className="border-b hover:bg-muted/50">
+                        <td className="p-2">
+                          {format(new Date(c.cancelledAt), "h:mm a", {
+                            locale: es,
+                          })}
+                        </td>
+                        <td className="p-2">
+                          <div>
+                            <p className="font-medium">
+                              Pedido #{c.orderNumber}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {c.itemsCount}{" "}
+                              {c.itemsCount === 1 ? "producto" : "productos"}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          <div>
+                            <p className="font-medium">{c.tableName}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Mesa #{c.tableNumber}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="p-2">
+                          <p
+                            className="text-sm max-w-xs truncate"
+                            title={c.reason}
+                          >
+                            {c.reason}
+                          </p>
+                        </td>
+                        <td className="p-2">
+                          <Badge variant="outline">{c.authorizedBy}</Badge>
+                        </td>
+                        <td className="p-2 text-right">
+                          <p className="font-semibold text-destructive">
+                            S/ {c.totalPedido.toFixed(2)}
+                          </p>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+                {movimientos.cancelaciones.length > 0 && (
+                  <tfoot>
+                    <tr className="border-t-2 font-semibold bg-muted/50">
+                      <td colSpan={5} className="p-2 text-right">
+                        Total en Cancelaciones:
+                      </td>
+                      <td className="p-2 text-right text-destructive">
+                        S/{" "}
+                        {movimientos.cancelaciones
+                          .reduce((sum, c) => sum + c.totalPedido, 0)
+                          .toFixed(2)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                )}
+              </table>
+            </div>
+
+            {/* Detalles expandibles opcional */}
+            {movimientos.cancelaciones.length > 0 && (
+              <Collapsible className="mt-4">
+                <CollapsibleTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                  <ChevronDown className="h-4 w-4" />
+                  Ver detalle de productos cancelados
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-4 space-y-4">
+                  {movimientos.cancelaciones.map((c) => (
+                    <Card key={c.id} className="p-4 bg-muted/30">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <p className="font-medium">
+                            Pedido #{c.orderNumber} - {c.tableName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(c.cancelledAt), "PPp", {
+                              locale: es,
+                            })}
+                          </p>
+                        </div>
+                        <Badge variant="destructive">Cancelado</Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        {c.items.map((item: any) => (
+                          <div
+                            key={item.productId}
+                            className="flex justify-between text-sm border-b pb-2 last:border-0"
+                          >
+                            <div>
+                              <p className="font-medium">{item.productName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {item.quantity} x S/ {item.price.toFixed(2)}
+                              </p>
+                            </div>
+                            <p className="font-semibold">
+                              S/ {item.subtotal.toFixed(2)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t">
+                        <div className="flex justify-between items-center">
+                          <div className="text-sm">
+                            <p className="text-muted-foreground">Motivo:</p>
+                            <p className="font-medium">{c.reason}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Autorizado por: {c.authorizedBy}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-muted-foreground">
+                              Total
+                            </p>
+                            <p className="text-lg font-bold text-destructive">
+                              S/ {c.totalPedido.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+          </Card>
+        </TabsContent>
+
         <TabsContent value="todos" className="mt-4">
           <Card className="p-6">
             <div className="space-y-2">
@@ -396,7 +570,7 @@ const CashRegisterDetailsPage = () => {
                 .sort(
                   (a, b) =>
                     new Date(b.createdAt).getTime() -
-                    new Date(a.createdAt).getTime(),
+                    new Date(a.createdAt).getTime()
                 )
                 .map((mov) => (
                   <div
