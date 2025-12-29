@@ -3,11 +3,13 @@ import {
   addItemsToOrder,
   cancelOrder,
   getActiveOrder,
+  orderItemsApi,
   requestPreAccount,
 } from "../services/orders.service";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useCartStore } from "@/stores/useCartStore";
+import { AxiosError } from "axios";
 
 export const useActiveOrder = (tableId: string) => {
   return useQuery({
@@ -68,6 +70,25 @@ export const useCancelOrder = () => {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Error al anular Orden");
+    },
+  });
+};
+
+export const useDeactivateOrderItem = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: orderItemsApi.deactivateItem,
+    onSuccess: () => {
+      toast.success("Item desactivado correctamente");
+      queryClient.invalidateQueries({ queryKey: ["active-order"] });
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message);
+      } else {
+        toast.error("Error al desactivar el item");
+      }
     },
   });
 };

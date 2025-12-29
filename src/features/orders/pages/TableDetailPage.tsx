@@ -22,11 +22,25 @@ import {
 import SpinnerLoading from "@/components/SpinnerLoading";
 import { PaymentModal } from "@/features/billing/components/PaymentModal";
 import { useState, useEffect } from "react";
-import { useActiveOrder, useRequestPreCount } from "../hooks/useOrders";
+import {
+  useActiveOrder,
+  useDeactivateOrderItem,
+  useRequestPreCount,
+} from "../hooks/useOrders";
 import { CancelOrderDialog } from "../components/CancelOrderDialog";
 import { PreCuentaModal } from "../components/PreCuentaModal";
 import { useCashRegister } from "@/features/caja/hooks/useCashRegister";
 import { OpenCashRegisterModal } from "@/features/caja/components/OpenCashRegisterModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const TableDetailPage = () => {
   const { id: tableId } = useParams();
@@ -40,6 +54,8 @@ const TableDetailPage = () => {
 
   const [showPreCuentaModal, setShowPreCuentaModal] = useState(false);
 
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
+
   // const tableName = searchParams.get("tableName");
   const piso = searchParams.get("piso");
   const tableNumber = searchParams.get("tableNumber");
@@ -50,6 +66,8 @@ const TableDetailPage = () => {
 
   const { data: order, isLoading, isError } = useActiveOrder(tableId!);
   const { mutate: preCount, isPending: loadingPreCount } = useRequestPreCount();
+  const { mutate: deactivateItem, isPending: isDeletingItem } =
+    useDeactivateOrderItem();
 
   useEffect(() => {
     if (action === "pay" && order && !paymentOpen) {
@@ -61,7 +79,9 @@ const TableDetailPage = () => {
   const unpaidItems = order?.items.filter((item) => !item.saleId) || [];
   const paidItems = order?.items.filter((item) => item.saleId) || [];
 
-  const totalAmount = unpaidItems.reduce((acc, item) => {
+  const activeItems = order?.items.filter((item) => item.isActive) || [];
+
+  const totalAmount = activeItems.reduce((acc, item) => {
     return acc + Number(item.price) * item.quantity;
   }, 0);
 
@@ -123,6 +143,20 @@ const TableDetailPage = () => {
         return "outline";
       default:
         return "secondary";
+    }
+  };
+
+  const handleDeleteItem = (itemId: string) => {
+    setItemToDelete(itemId);
+  };
+
+  const confirmDeleteItem = () => {
+    if (itemToDelete) {
+      deactivateItem(itemToDelete, {
+        onSuccess: () => {
+          setItemToDelete(null);
+        },
+      });
     }
   };
 
@@ -194,7 +228,7 @@ const TableDetailPage = () => {
                         disabled={loadingPreCount}
                         className="flex-1 gap-2"
                       >
-                        <Receipt className="" />
+                        <Receipt />
                         {loadingPreCount ? "Solicitando..." : "Pre-Cuenta"}
                       </Button>
 
@@ -250,87 +284,90 @@ const TableDetailPage = () => {
 
           <CardContent>
             <div className="divide-y divide-border">
-              {order.items.map((item) => {
-                const isPaid = !!item.saleId;
-
-                return (
-                  <div
-                    key={item.id}
-                    className={`flex items-start justify-between p-1 hover:bg-muted/30 transition-colors ${
-                      isPaid ? "" : ""
-                    }`}
-                  >
-                    <div className="flex gap-4">
-                      <div
-                        className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                          isPaid ? "bg-green-200" : "bg-primary/10"
+              {order.items.map((item) => (
+                <div
+                  key={item.id}
+                  className={`flex items-start justify-between p-1 transition-colors ${
+                    !item.isActive
+                      ? "opacity-50 bg-muted/50 line-through"
+                      : "hover:bg-muted/30"
+                  }`}
+                >
+                  <div className="flex gap-4">
+                    <div
+                      className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                        item.isActive ? "bg-primary/10" : "bg-muted"
+                      }`}
+                    >
+                      <span
+                        className={`font-bold ${
+                          item.isActive
+                            ? "text-primary"
+                            : "text-muted-foreground"
                         }`}
                       >
-                        {isPaid ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-700" />
-                        ) : (
-                          <span className="font-bold text-primary">
-                            {item.quantity}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <p
-                            className={`font-medium text-foreground ${
-                              isPaid ? "line-through text-muted-foreground" : ""
-                            }`}
-                          >
-                            {item.product.name}
-                          </p>
-                          {isPaid && (
-                            <Badge
-                              variant="outline"
-                              className="text-[10px] bg-green-100 text-green-700"
-                            >
-                              PAGADO
-                            </Badge>
-                          )}
-                          {!isPaid && (
-                            <Badge variant="secondary" className="text-[10px]">
-                              {item.quantity}x
-                            </Badge>
-                          )}
-                        </div>
-
-                        {item.variantsDetail && (
-                          <p className="text-sm text-muted-foreground flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary/50" />
-                            {item.variantsDetail}
-                          </p>
-                        )}
-
-                        {item.notes && (
-                          <p className="text-sm text-secondary italic bg-secondary/10 px-2 py-1 rounded-md inline-block">
-                            {item.notes}
-                          </p>
-                        )}
-                      </div>
+                        {item.quantity}
+                      </span>
                     </div>
-
+                    <div className="space-y-1">
+                      <p
+                        className={`font-medium ${
+                          item.isActive
+                            ? "text-foreground"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {item.product.name}
+                        {!item.isActive && (
+                          <Badge variant="destructive" className="ml-2 text-xs">
+                            ELIMINADO
+                          </Badge>
+                        )}
+                      </p>
+                      {item.variantsDetail && (
+                        <p className="text-sm text-muted-foreground flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                          {item.variantsDetail}
+                        </p>
+                      )}
+                      {item.notes && (
+                        <p className="text-sm text-secondary italic bg-secondary/10 px-2 py-1 rounded-md inline-block">
+                          {item.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
                     <div className="text-right">
                       <p
                         className={`font-semibold font-mono ${
-                          isPaid ? "text-muted-foreground" : "text-foreground"
+                          item.isActive
+                            ? "text-foreground"
+                            : "text-muted-foreground"
                         }`}
                       >
                         S/ {(Number(item.price) * item.quantity).toFixed(2)}
                       </p>
-                      {item.quantity > 1 && !isPaid && (
+                      {item.quantity > 1 && (
                         <p className="text-xs text-muted-foreground font-mono">
                           S/ {Number(item.price).toFixed(2)} c/u
                         </p>
                       )}
                     </div>
+                    {item.isActive && (
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="cursor-pointer"
+                        onClick={() => handleDeleteItem(item.id)}
+                        disabled={isDeletingItem}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </CardContent>
 
@@ -406,11 +443,38 @@ const TableDetailPage = () => {
         <PreCuentaModal
           open={showPreCuentaModal}
           onClose={() => setShowPreCuentaModal(false)}
-          order={order}
+          order={{
+            ...order,
+            items: activeItems,
+          }}
           onConfirm={handleConfirmPreAccount}
           isLoading={loadingPreCount}
         />
       )}
+
+      <AlertDialog
+        open={!!itemToDelete}
+        onOpenChange={() => setItemToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar este item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              El item será marcado como eliminado y no se contará en el total.
+              Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteItem}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

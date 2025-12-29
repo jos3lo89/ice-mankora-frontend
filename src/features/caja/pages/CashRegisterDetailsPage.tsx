@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   AlertCircle,
   ChevronDown,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -20,9 +21,13 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { SaleDetailsModal } from "@/features/billing/components/SaleDetailsModal";
 
 const CashRegisterDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
+  const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["cash-register-details", id],
@@ -170,8 +175,8 @@ const CashRegisterDetailsPage = () => {
                 totales.diferencia === 0
                   ? "text-green-600"
                   : totales.diferencia > 0
-                  ? "text-blue-600"
-                  : "text-red-600"
+                    ? "text-blue-600"
+                    : "text-red-600"
               }`}
             >
               Dif: S/ {Math.abs(totales.diferencia).toFixed(2)}
@@ -193,7 +198,7 @@ const CashRegisterDetailsPage = () => {
                   {data.count} {data.count === 1 ? "venta" : "ventas"}
                 </p>
               </div>
-            )
+            ),
           )}
         </div>
       </Card>
@@ -227,6 +232,7 @@ const CashRegisterDetailsPage = () => {
                     <th className="text-left p-2">Mesa</th>
                     <th className="text-left p-2">Método</th>
                     <th className="text-right p-2">Total</th>
+                    <th className="text-right p-2">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -292,6 +298,15 @@ const CashRegisterDetailsPage = () => {
                       <td className="p-2 text-right font-semibold">
                         S/ {venta.total.toFixed(2)}
                       </td>
+                      <td className="p-2 text-center">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setSelectedSaleId(venta.id)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -299,6 +314,11 @@ const CashRegisterDetailsPage = () => {
             </div>
           </Card>
         </TabsContent>
+        <SaleDetailsModal
+          open={!!selectedSaleId}
+          onClose={() => setSelectedSaleId(null)}
+          saleId={selectedSaleId}
+        />
 
         {/* Tab Ingresos Extra */}
         <TabsContent value="ingresos" className="mt-4">
@@ -570,7 +590,7 @@ const CashRegisterDetailsPage = () => {
                 .sort(
                   (a, b) =>
                     new Date(b.createdAt).getTime() -
-                    new Date(a.createdAt).getTime()
+                    new Date(a.createdAt).getTime(),
                 )
                 .map((mov) => (
                   <div

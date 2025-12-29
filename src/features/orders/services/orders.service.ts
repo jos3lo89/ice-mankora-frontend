@@ -88,3 +88,10 @@ export const retryPrint = async (printLogId: string) => {
   );
   return data;
 };
+
+export const orderItemsApi = {
+  deactivateItem: async (itemId: string) => {
+    const { data } = await axiosInstance.patch(`/orders/items/${itemId}/deactivate`);
+    return data;
+  },
+};

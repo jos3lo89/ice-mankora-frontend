@@ -91,38 +91,6 @@ export const PaymentModal = ({
     }
   }, [docType]);
 
-  // const handleSearchDocument = async () => {
-  //   if (!clientDoc) {
-  //     toast.error("Ingrese un documento");
-  //     return;
-  //   }
-
-  //   setSearchingDoc(true);
-
-  //   try {
-  //     if (docType === ComprobanteType.FACTURA && clientDoc.length === 11) {
-  //       const response = await searchRUC(clientDoc);
-  //       if (response.estado) {
-  //         setClientName(response.resultado.razon_social);
-  //         setClientAddress(response.resultado.direccion || "");
-  //         toast.success("RUC encontrado");
-  //       }
-  //     } else if (docType === ComprobanteType.BOLETA && clientDoc.length === 8) {
-  //       const response = await searchDNI(clientDoc);
-  //       if (response.estado) {
-  //         setClientName(response.resultado.nombre_completo);
-  //         toast.success("DNI encontrado");
-  //       }
-  //     } else {
-  //       toast.error("Documento inválido");
-  //     }
-  //   } catch (error: any) {
-  //     toast.error(error.message || "No se encontró el documento");
-  //   } finally {
-  //     setSearchingDoc(false);
-  //   }
-  // };
-
   const handlePay = () => {
     if (docType === ComprobanteType.FACTURA) {
       if (clientDoc.length !== 11) {
