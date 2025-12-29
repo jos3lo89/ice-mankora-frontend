@@ -53,6 +53,8 @@ function SortableItem({
   item: any;
   isPaid: boolean;
 }) {
+  console.log(item);
+
   const {
     attributes,
     listeners,
@@ -217,8 +219,10 @@ export default function SplitBillPage() {
   useEffect(() => {
     if (!order) return;
 
-    const unpaidItems = order.items.filter((item) => !item.saleId);
-    const paidItems = order.items.filter((item) => item.saleId);
+    const newOrders = order.items.filter((i) => i.isActive);
+
+    const unpaidItems = newOrders.filter((item) => !item.saleId);
+    const paidItems = newOrders.filter((item) => item.saleId);
 
     setColumns((prev) => {
       if (Object.keys(prev).length > 0) {

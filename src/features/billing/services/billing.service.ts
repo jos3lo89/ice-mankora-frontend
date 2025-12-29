@@ -13,3 +13,10 @@ export const getPrintData = async (saleId: string): Promise<PrintData> => {
   const { data } = await axiosInstance.get(`/billing/${saleId}/print-data`);
   return data;
 };
+
+export const billingApi = {
+  getSaleDetails: async (saleId: string) => {
+    const response = await axiosInstance.get(`/billing/${saleId}/details`);
+    return response.data;
+  },
+};

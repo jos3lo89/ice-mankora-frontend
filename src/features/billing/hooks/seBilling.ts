@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createSale, getPrintData } from "../services/billing.service";
+import {
+  billingApi,
+  createSale,
+  getPrintData,
+} from "../services/billing.service";
 import { toast } from "sonner";
 
 export const useCreateSale2 = (
@@ -57,6 +61,14 @@ export const usePrintData = (saleId: string | null) => {
   return useQuery({
     queryKey: ["print-data", saleId],
     queryFn: () => getPrintData(saleId!),
+    enabled: !!saleId,
+  });
+};
+
+export const useSaleDetails = (saleId: string | null) => {
+  return useQuery({
+    queryKey: ["sale-details", saleId],
+    queryFn: () => billingApi.getSaleDetails(saleId!),
     enabled: !!saleId,
   });
 };
